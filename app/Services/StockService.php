@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Repositories\StockRepository;
+use App\Repositories\StockHistoryRepository;
 
 class StockService
 {
-    protected $stockRepository;
+    protected $stockHistoryRepository;
 
-    public function __construct(StockRepository $stockRepository)
+    public function __construct(StockHistoryRepository $stockHistoryRepository)
     {
-        $this->stockRepository = $stockRepository;
+        $this->stockHistoryRepository = $stockHistoryRepository;
     }
 }
