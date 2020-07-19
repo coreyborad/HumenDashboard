@@ -17,13 +17,10 @@ class StockHistory extends Model
         'stock_number',
         'deal_date',
         'deal_count',
-        'deal_price',
-        'deal_record',
         'price_on_open',
         'price_on_highest',
         'price_on_lowest',
         'price_on_close',
-        'price_diff',
     ];
 
     /**
