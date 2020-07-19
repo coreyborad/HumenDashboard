@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class StockHistory extends Model
 {
     protected $connection = 'mysql';
-
+    protected $table = 'stock_history';
     /**
      * The attributes that are mass assignable.
      *
@@ -15,9 +15,15 @@ class StockHistory extends Model
      */
     protected $fillable = [
         'stock_number',
-        'user_id',
-        'total_cost',
-        'total_value'
+        'deal_date',
+        'deal_count',
+        'deal_price',
+        'deal_record',
+        'price_on_open',
+        'price_on_highest',
+        'price_on_lowest',
+        'price_on_close',
+        'price_diff',
     ];
 
     /**

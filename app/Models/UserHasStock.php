@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Stock extends Model
+class UserHasStock extends Model
 {
     protected $connection = 'mysql';
-
+    protected $table = 'user_has_stock';
     /**
      * The attributes that are mass assignable.
      *
@@ -17,8 +17,7 @@ class Stock extends Model
         'stock_number',
         'user_id',
         'shares',
-        'cost',
-        'price'
+        'cost'
     ];
 
     /**

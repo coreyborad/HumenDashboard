@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Models\Stock;
+use App\Models\UserHasStock;
 use Prettus\Repository\Eloquent\BaseRepository;
 
-class StockRepository extends BaseRepository
+class UserHasStockRepository extends BaseRepository
 {
     public function model(): string
     {
-        return Stock::class;
+        return UserHasStock::class;
     }
 
 }
