@@ -14,10 +14,11 @@ class CreateStockInfoTable extends Migration
     public function up()
     {
         Schema::create('stock_info', function (Blueprint $table) {
-            $table->bigIncrements('id');
             $table->string('stock_number'); // 股票編號
             $table->string('stock_name');
             $table->timestamps();
+
+            $table->primary('stock_number');
         });
     }
 
