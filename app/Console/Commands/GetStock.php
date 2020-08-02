@@ -3,12 +3,14 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Ixudra\Curl\Facades\Curl;
+use Illuminate\Support\Facades\Http;
 use App\Repositories\StockHistoryRepository;
+use App\Repositories\StockInfoRepository;
 
 class GetStock extends Command
 {
     protected $stockHistoryRepository;
+    protected $stockInfoRepository;
 
     /**
      * The name and signature of the console command.
@@ -29,10 +31,14 @@ class GetStock extends Command
      *
      * @return void
      */
-    public function __construct(StockHistoryRepository $stockHistoryRepository)
+    public function __construct(
+        StockHistoryRepository $stockHistoryRepository,
+        StockInfoRepository $stockInfoRepository
+    )
     {
         parent::__construct();
         $this->stockHistoryRepository = $stockHistoryRepository;
+        $this->stockInfoRepository = $stockInfoRepository;
     }
 
     /**
@@ -42,10 +48,16 @@ class GetStock extends Command
      */
     public function handle()
     {
-        $response = Curl::to('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=json')
-            ->asJson()
-            ->get();
+        $response = Http::get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=json');
+        $response = $response->json();
         foreach ($response->data as $stock) {
+            $stockInfo = $this->stockHistoryRepository->findByField('stock_name', $stock[0]);
+            if(!$stockInfo){
+                $stockInfo = $this->stockHistoryRepository->create([
+                    'stock_number' => $stock[0],
+                    'stock_name' => $stock[1]
+                ]);
+            }
             $this->stockHistoryRepository->create([
                 'stock_number' => $stock[0],
                 'deal_date' => $response->date,
