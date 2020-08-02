@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use App\Repositories\StockHistoryRepository;
 use App\Repositories\StockInfoRepository;
+use Exception;
 
 class GetStock extends Command
 {
@@ -50,23 +51,27 @@ class GetStock extends Command
     {
         $response = Http::get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=json');
         $response = $response->json();
-        foreach ($response->data as $stock) {
-            $stockInfo = $this->stockHistoryRepository->findByField('stock_name', $stock[0]);
-            if(!$stockInfo){
-                $stockInfo = $this->stockHistoryRepository->create([
+        foreach ($response['data'] as $stock) {
+            try {
+                $stockInfo = $this->stockInfoRepository->findByField('stock_name', $stock[0])->first();
+                if(!$stockInfo){
+                    $stockInfo = $this->stockInfoRepository->create([
+                        'stock_number' => $stock[0],
+                        'stock_name' => $stock[1]
+                    ]);
+                }
+                $this->stockHistoryRepository->create([
                     'stock_number' => $stock[0],
-                    'stock_name' => $stock[1]
+                    'deal_date' => $response['date'],
+                    'deal_count' => intval(str_replace(',', '', $stock[2])),
+                    'price_on_open' => floatval(str_replace(',', '', $stock[4])),
+                    'price_on_highest' => floatval(str_replace(',', '', $stock[5])),
+                    'price_on_lowest' => floatval(str_replace(',', '', $stock[6])),
+                    'price_on_close' => floatval(str_replace(',', '', $stock[7])),
                 ]);
+            } catch (Exception $e) {
+                //throw $th;
             }
-            $this->stockHistoryRepository->create([
-                'stock_number' => $stock[0],
-                'deal_date' => $response->date,
-                'deal_count' => intval(str_replace(',', '', $stock[2])),
-                'price_on_open' => floatval(str_replace(',', '', $stock[4])),
-                'price_on_highest' => floatval(str_replace(',', '', $stock[5])),
-                'price_on_lowest' => floatval(str_replace(',', '', $stock[6])),
-                'price_on_close' => floatval(str_replace(',', '', $stock[7])),
-            ]);
         }
     }
 }
