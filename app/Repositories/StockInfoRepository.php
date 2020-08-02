@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\Stock;
+use App\Models\StockInfo;
 use Prettus\Repository\Eloquent\BaseRepository;
 
 class StockInfoRepository extends BaseRepository
