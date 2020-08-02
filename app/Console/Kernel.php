@@ -24,8 +24,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('stock:get')->cron('0 16 * * 1-5');
-        //          ->hourly();
+        $schedule->command('stock:get')
+        ->cron('0 16 * * 1-5')
+        ->after(function () {
+            $this->command();
+        });;
     }
 
     /**
