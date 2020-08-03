@@ -53,8 +53,8 @@ class GetStock extends Command
         $response = $response->json();
         foreach ($response['data'] as $stock) {
             try {
-                $stockInfo = $this->stockInfoRepository->findByField('stock_name', $stock[0])->first();
-                if(!$stockInfo){
+                $stockInfo = $this->stockInfoRepository->findByField('stock_number', $stock[0])->first();
+                if($stockInfo === null){
                     $stockInfo = $this->stockInfoRepository->create([
                         'stock_number' => $stock[0],
                         'stock_name' => $stock[1]
@@ -69,8 +69,9 @@ class GetStock extends Command
                     'price_on_lowest' => floatval(str_replace(',', '', $stock[6])),
                     'price_on_close' => floatval(str_replace(',', '', $stock[7])),
                 ]);
+                
             } catch (Exception $e) {
-                //throw $th;
+                // var_dump($e->getMessage());
             }
         }
     }
