@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        'App\Console\Commands\GetStock'
     ];
 
     /**
@@ -24,11 +24,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('stock:get')
-        ->cron('0 16 * * 1-5')
-        ->after(function () {
-            $this->command();
-        });;
+        $schedule->command('stock:get')->cron('0 16 * * 1-5');
+        // $schedule->command('stock:get')
+        // ->cron('* * * * *')
+        // ->after(function () {
+        //     $this->command();
+        // });
     }
 
     /**
