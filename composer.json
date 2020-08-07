@@ -13,6 +13,7 @@
         "guzzlehttp/guzzle": "^7.0",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
+        "nesbot/carbon": "^2.38",
         "prettus/l5-repository": "^2.6",
         "tymon/jwt-auth": "dev-develop"
     },
