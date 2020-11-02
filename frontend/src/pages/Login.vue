@@ -26,7 +26,7 @@
                   required
                 />
               </v-form>
-              <v-btn style="float: right;" color="primary">Login</v-btn>
+              <v-btn style="float: right;" color="primary" @click="login()">Login</v-btn>
             </div>
           </div>
         </div>
@@ -45,6 +45,13 @@ export default {
       form: {
         email: '',
         password: ''
+      }
+    }
+  },
+  methods: {
+    async login() {
+      if (this.$refs.form.validate()) {
+        this.$store.dispatch('user/login', this.form)
       }
     }
   }
