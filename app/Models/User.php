@@ -10,7 +10,9 @@ use Hash;
 
 class User extends Authenticatable implements JWTSubject
 {
+    protected $guard_name = 'api';
     protected $connection = 'mysql';
+    protected $table = 'users';
 
     use Notifiable;
 
