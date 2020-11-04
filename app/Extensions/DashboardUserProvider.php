@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Hash;
 
 class DashboardUserProvider implements UserProvider
 {
@@ -62,7 +63,7 @@ class DashboardUserProvider implements UserProvider
 
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        $cypher = sha1($credentials['password']);
+        $cypher = Hash::make($credentials['password']);
 
         return hash_equals($cypher, strtolower($user->getAuthPassword()));
     }
