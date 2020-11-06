@@ -26,10 +26,27 @@
                   required
                 />
               </v-form>
-              <v-btn style="float: right;" color="primary" @click="login()">Login</v-btn>
+              <v-btn
+                style="float: right;"
+                color="primary"
+                :loading="loading"
+                @click="login()"
+              >
+                Login
+              </v-btn>
             </div>
           </div>
         </div>
+        <!-- Alert -->
+        <v-alert
+          v-model="errAlertVisible"
+          dismissible
+          text
+          dark
+          type="error"
+        >
+          Login Error
+        </v-alert>
       </v-container>
     </v-main>
   </v-app>
@@ -42,6 +59,8 @@ export default {
   },
   data() {
     return {
+      loading: false,
+      errAlertVisible: false,
       form: {
         email: '',
         password: ''
@@ -50,8 +69,22 @@ export default {
   },
   methods: {
     async login() {
+      this.loading = true
       if (this.$refs.form.validate()) {
-        this.$store.dispatch('user/login', this.form)
+        this.$store.dispatch('user/login', this.form).then(() => {
+          setTimeout(() => {
+            this.$router.push({ path: this.redirect || '/' })
+          }, 1000)
+          this.loading = false
+        }).catch(() => {
+          this.errAlertVisible = true
+          this.loading = false
+          setTimeout(() => {
+            this.errAlertVisible = false
+          }, 10000)
+        })
+      } else {
+        this.loading = false
       }
     }
   }

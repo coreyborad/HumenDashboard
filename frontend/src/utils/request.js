@@ -2,7 +2,6 @@ import axios from 'axios'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
-console.log(process.env, 'asdasdasd')
 // create an axios instance
 const service = axios.create({
   baseURL: process.env.VUE_APP_WEB_API, // url = base url + request url
@@ -45,7 +44,7 @@ service.interceptors.response.use(
     } else {
       if (errorResponse && errorResponse.data && errorResponse.data.error.indexOf('token is expired') > -1) {
         try {
-          await store.dispatch('user/refreshToken', getToken())
+          // await store.dispatch('user/refreshToken', getToken())
 
           requests.forEach(cb => cb())
           requests = []
