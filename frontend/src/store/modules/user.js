@@ -42,7 +42,7 @@ const actions = {
   // user logout
   async logout({ commit, state }) {
     try {
-      await logout()
+      // await logout()
       removeToken()
     } catch (error) {
       throw error
@@ -51,7 +51,7 @@ const actions = {
   // set user
   async setUser({ commit }) {
     try {
-      const data = await getUserInfo()
+      // const data = await getUserInfo()
       commit('SET_USER', data)
     } catch (error) {
       throw error
