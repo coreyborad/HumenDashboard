@@ -6,30 +6,54 @@
         nav
       >
         <v-list-item
-          v-for="item in items"
-          :key="item.title"
+          v-for="item in routes[1].children"
+          :key="item.name"
+          :to="item.path"
           link
         >
           <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
+            <v-icon>{{ item.meta.icon }}</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+            <v-list-item-title>{{ item.meta.title }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
     <v-app-bar app>
-      789
+      <span>{{ matched }}</span>
+      <span style="right: 0; position: absolute;">
+        <v-menu offset-y>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+            >
+              <v-icon>mdi-dialpad</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <v-list-item
+              v-for="(item, index) in menu"
+              :key="index"
+              link
+            >
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+
+      </span>
+
     </v-app-bar>
 
     <!-- Sizes your content based upon application components -->
     <v-main>
       <!-- Provides the application the proper gutter -->
       <v-container>
-        {{ routes }}
         <!-- If using vue-router -->
         <router-view />
       </v-container>
@@ -44,16 +68,20 @@ export default {
   },
   data() {
     return {
-      items: [
-        { title: 'Dashboard', icon: 'mdi-view-dashboard' },
-        { title: 'Photos', icon: 'mdi-image' },
-        { title: 'About', icon: 'mdi-help-box' }
+      menu: [
+        {
+          title: 'Logout'
+        }
       ]
     }
   },
   computed: {
     routes() {
       return this.$router.options.routes
+    },
+    matched() {
+      const matched = this.$route.matched.filter(item => item.meta && item.meta.title)
+      return matched[1].name
     }
   },
   watch: {
@@ -65,15 +93,6 @@ export default {
     }
   },
   methods: {
-    menu() {
-      const route = this.$route
-      const { meta, path } = route
-      // if set path, the sidebar will highlight the path you set
-      if (meta.activeMenu) {
-        return meta.activeMenu
-      }
-      return path
-    }
   }
 }
 </script>
