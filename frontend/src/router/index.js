@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Login from '../pages/Login.vue'
-import MainLayout from '../pages/MainLayout.vue'
 import { getToken } from '@/utils/auth'
 Vue.use(VueRouter)
 
@@ -9,24 +7,26 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: () => import('@/pages/Login.vue'),
   },
   {
     path: '/',
     name: 'MainLayout',
     meta: { title: 'Main', requiresAuth: true },
-    component: MainLayout,
+    component: () => import('@/pages/MainLayout.vue'),
     redirect: 'summary',
     children: [
       {
         path: 'summary',
         name: 'Summary',
-        meta: { title: 'Summary', icon: 'summary' }
+        meta: { title: 'Summary', icon: 'mdi-view-dashboard' },
+        component: () => import('@/pages/Summary')
       },
       {
-        path: 'my_stock',
-        name: 'My Stock',
-        meta: { title: 'My Stock', icon: 'stock' }
+        path: 'stocks',
+        name: 'Stocks',
+        meta: { title: 'Stocks', icon: 'mdi-image' },
+        component: () => import('@/pages/Stocks')
       }
     ]
   }
