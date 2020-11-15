@@ -12,7 +12,6 @@
         "fideloper/proxy": "^4.0",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.2",
-        "influxdata/influxdb-client-php": "^1.8",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
         "nesbot/carbon": "^2.38",
