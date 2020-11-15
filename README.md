@@ -1,5 +1,5 @@
 ## Start
 
 ```
-docker-compose up -d nginx mysql php-worker
+docker-compose up -d --build mysql nginx php-worker mongo
 ```

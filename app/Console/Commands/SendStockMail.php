@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Repositories\UserRepository;
-use App\Repositories\StockHistoryRepository;
+use App\Repositories\Mongo\StockHistoryRepository as MongoStockHistoryRepository;
 use App\Repositories\StockInfoRepository;
 use Carbon\Carbon;
 use App\Mail\StockDaily as DailyMail;
@@ -14,7 +14,7 @@ class SendStockMail extends Command
 {
 
     protected $userRepository;
-    protected $stockHistoryRepository;
+    protected $mongoStockHistoryRepository;
     protected $stockInfoRepository;
 
     /**
@@ -38,13 +38,13 @@ class SendStockMail extends Command
      */
     public function __construct(
         UserRepository $userRepository,
-        StockHistoryRepository $stockHistoryRepository,
+        MongoStockHistoryRepository $mongoStockHistoryRepository,
         StockInfoRepository $stockInfoRepository
     )
     {
         parent::__construct();
         $this->userRepository = $userRepository;
-        $this->stockHistoryRepository = $stockHistoryRepository;
+        $this->mongoStockHistoryRepository = $mongoStockHistoryRepository;
         $this->stockInfoRepository = $stockInfoRepository;
     }
 
@@ -63,14 +63,14 @@ class SendStockMail extends Command
                 array_push($stock_list, $stock->stock_number);
             }
             
-            $lasttwodays = $this->stockHistoryRepository
+            $lasttwodays = $this->mongoStockHistoryRepository
                 ->select('deal_date')
                 ->groupBy('deal_date')
                 ->orderBy('deal_date', 'desc')
                 ->limit(2)
                 ->get();
 
-            $historys = $this->stockHistoryRepository
+            $historys = $this->mongoStockHistoryRepository
                 ->scopeQuery(function($query) use($stock_list, $lasttwodays){
                     return $query->whereIn('stock_number', $stock_list)
                                 ->whereIn(

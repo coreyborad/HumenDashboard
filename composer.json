@@ -16,7 +16,8 @@
         "laravel/tinker": "^2.0",
         "nesbot/carbon": "^2.38",
         "prettus/l5-repository": "^2.6",
-        "tymon/jwt-auth": "dev-develop"
+        "tymon/jwt-auth": "dev-develop",
+        "jenssegers/mongodb": "^3.7"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
