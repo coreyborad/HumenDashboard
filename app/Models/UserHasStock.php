@@ -31,4 +31,8 @@ class UserHasStock extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
+    public function stock_info()
+    {
+        return $this->hasOne(StockInfo::class, 'stock_number', 'stock_number');
+    }
 }

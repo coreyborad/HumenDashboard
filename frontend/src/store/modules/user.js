@@ -47,16 +47,16 @@ const actions = {
     } catch (error) {
       throw error
     }
-  },
-  // set user
-  async setUser({ commit }) {
-    try {
-      // const data = await getUserInfo()
-      commit('SET_USER', data)
-    } catch (error) {
-      throw error
-    }
   }
+  // set user
+  // async setUser({ commit }) {
+  //   try {
+  //     // const data = await getUserInfo()
+  //     commit('SET_USER', data)
+  //   } catch (error) {
+  //     throw error
+  //   }
+  // }
 }
 
 export default {

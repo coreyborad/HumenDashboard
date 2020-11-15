@@ -40,6 +40,7 @@
               v-for="(item, index) in menu"
               :key="index"
               link
+              @click="menuActionClick(item.action)"
             >
               <v-list-item-title>{{ item.title }}</v-list-item-title>
             </v-list-item>
@@ -68,9 +69,11 @@ export default {
   },
   data() {
     return {
+      loading: false,
       menu: [
         {
-          title: 'Logout'
+          title: 'Logout',
+          action: 'logout'
         }
       ]
     }
@@ -93,6 +96,18 @@ export default {
     }
   },
   methods: {
+    menuActionClick(action) {
+      switch (action) {
+        case 'logout':
+          this.$store.dispatch('user/logout').then(() => {
+            setTimeout(() => {
+              this.$router.push({ path: '/login' })
+            }, 1000)
+            this.loading = false
+          })
+          break
+      }
+    }
   }
 }
 </script>
