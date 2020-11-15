@@ -1,5 +1,5 @@
 ## Start
 
 ```
-docker-compose up -d nginx mysql
+docker-compose up -d nginx mysql php-worker influxdb
 ```
