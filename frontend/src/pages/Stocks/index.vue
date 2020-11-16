@@ -159,7 +159,7 @@ export default {
   watch: {
   },
   async created() {
-    this.init()
+    await this.init()
   },
   methods: {
     async init() {
