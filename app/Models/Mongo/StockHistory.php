@@ -4,6 +4,7 @@ namespace App\Models\Mongo;
 
 use Jenssegers\Mongodb\Eloquent\Model;
 use App\Models\User;
+use Carbon\Carbon;
 
 class StockHistory extends Model
 {
@@ -25,5 +26,27 @@ class StockHistory extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id');
+    }
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::createFromTimestamp(strtotime($value))
+            ->timezone('Asia/Taipei')
+            ->toDateTimeString()
+        ;
+    }
+    public function getUpdatedAtAttribute($value)
+    {
+        return Carbon::createFromTimestamp(strtotime($value))
+            ->timezone('Asia/Taipei')
+            ->toDateTimeString()
+        ;
+    }
+    public function getDealDateAttribute($value)
+    {
+        return Carbon::createFromTimestamp(strtotime($value))
+            ->timezone('Asia/Taipei')
+            ->toDateTimeString()
+        ;
     }
 }

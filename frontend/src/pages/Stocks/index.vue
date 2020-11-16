@@ -117,7 +117,7 @@
 
 <script>
 import {
-  getStock
+  getUserStock, createUserStock, deleteUserStock
 } from '@/api/stock'
 
 export default {
@@ -159,24 +159,30 @@ export default {
   watch: {
   },
   async created() {
-    const data = await getStock()
-    this.tableData = data
+    this.init()
   },
   methods: {
+    async init() {
+      const data = await getUserStock()
+      this.tableData = data
+    },
     editStock(item) {
       console.log(item)
     },
-    deleteStock(item) {
-      console.log(item)
+    async deleteStock(item) {
+      await deleteUserStock(item.id)
+      this.init()
     },
     close() {
       this.dialog = false
       this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editItem = Object.assign({}, this.defaultItem)
       })
     },
-    save() {
+    async save() {
+      await createUserStock(this.editItem)
       this.dialog = false
+      this.init()
     }
   }
 }
