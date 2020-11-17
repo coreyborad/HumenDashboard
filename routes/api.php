@@ -20,7 +20,13 @@ use Illuminate\Http\Request;
 Route::group(['prefix' => 'v1'], function () {
     Route::post('signup', 'AuthController@signup');
     Route::post('login', 'AuthController@login');
-    Route::middleware('auth:token')->group(function () {
+    Route::middleware('auth:api')->group(function () {
         Route::post('logout', 'AuthController@logout');
+        // Stock
+        Route::group(['prefix' => 'user_stock'], function () {
+            Route::get('', 'StockController@getUserStock');
+            Route::post('', 'StockController@createUserStock');
+            Route::delete('{id}', 'StockController@deleteUserStock');
+        });
     });
 });

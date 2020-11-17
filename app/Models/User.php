@@ -10,7 +10,9 @@ use Hash;
 
 class User extends Authenticatable implements JWTSubject
 {
+    protected $guard_name = 'api';
     protected $connection = 'mysql';
+    protected $table = 'users';
 
     use Notifiable;
 
@@ -72,5 +74,10 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function stocks()
+    {
+        return $this->hasMany(UserHasStock::class, 'user_id', 'id');
     }
 }

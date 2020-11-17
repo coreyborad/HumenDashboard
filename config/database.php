@@ -90,6 +90,17 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+        'mongodb' => [
+            'driver'   => 'mongodb',
+            'host'     => env('MONGODB_HOST', 'localhost'),
+            'port'     => env('MONGODB_PORT', 27017),
+            'database' => env('MONGODB_DATABASE', 'database'),
+            'username' => env('MONGODB_USERNAME', 'database'),
+            'password' => env('MONGODB_PASSWORD', 'database'),
+            'options'  => [
+                'database' => env('DB_AUTHENTICATION_DATABASE', 'admin'), // required with Mongo 3+
+            ]
+        ],
 
     ],
 

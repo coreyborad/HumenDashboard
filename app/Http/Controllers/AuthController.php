@@ -20,7 +20,6 @@ class AuthController extends Controller
             throw new ErrorException(400, 'invalid_request', 'Missing grant type');
         } elseif ($grantType === 'password') {
             $credentials = request(['email','password']);
-
             // 驗證是否有缺少參數
             if (!isset($credentials['email'])) {
                 throw new ErrorException(400, 'invalid_request', "Request was missing the 'email' parameter");
