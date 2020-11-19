@@ -15,6 +15,6 @@ class UserService
 
     public function fetchUser(int $id)
     {
-        return $this->userRepository->find($id)->user()->get();
+        return $this->userRepository->find($id);
     }
 }
