@@ -1,12 +1,11 @@
 import request from '@/utils/request'
 
-export function login(data) {
-  return request({
-    url: '/vue-admin-template/user/login',
-    method: 'post',
-    data
+export const login = async data =>
+  await request.post('login', {
+    grant_type: 'password',
+    email: data.email,
+    password: data.password
   })
-}
 
 export function getInfo(token) {
   return request({
@@ -16,9 +15,9 @@ export function getInfo(token) {
   })
 }
 
-export function logout() {
-  return request({
-    url: '/vue-admin-template/user/logout',
-    method: 'post'
-  })
-}
+// export function logout() {
+//   return request({
+//     url: '/vue-admin-template/user/logout',
+//     method: 'post'
+//   })
+// }
