@@ -22,7 +22,15 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('login', 'AuthController@login');
     Route::middleware('auth:api')->group(function () {
         Route::post('logout', 'AuthController@logout');
+        // User
+        Route::group(['prefix' => 'user'], function () {
+            Route::get('', 'UserController@getUserInfo');
+        });
         // Stock
+        // User
+        Route::group(['prefix' => 'stock'], function () {
+            Route::get('', 'StockController@getStockList');
+        });
         Route::group(['prefix' => 'user_stock'], function () {
             Route::get('', 'StockController@getUserStock');
             Route::post('', 'StockController@createUserStock');

@@ -28,25 +28,25 @@ class StockHistory extends Model
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public function getCreatedAtAttribute($value)
-    {
-        return Carbon::createFromTimestamp(strtotime($value))
-            ->timezone('Asia/Taipei')
-            ->toDateTimeString()
-        ;
-    }
-    public function getUpdatedAtAttribute($value)
-    {
-        return Carbon::createFromTimestamp(strtotime($value))
-            ->timezone('Asia/Taipei')
-            ->toDateTimeString()
-        ;
-    }
-    public function getDealDateAttribute($value)
-    {
-        return Carbon::createFromTimestamp(strtotime($value))
-            ->timezone('Asia/Taipei')
-            ->toDateTimeString()
-        ;
-    }
+    // public function getCreatedAtAttribute($value)
+    // {
+    //     return Carbon::createFromTimestamp(strtotime($value))
+    //         ->timezone('Asia/Taipei')
+    //         ->toDateTimeString()
+    //     ;
+    // }
+    // public function getUpdatedAtAttribute($value)
+    // {
+    //     return Carbon::createFromTimestamp(strtotime($value))
+    //         ->timezone('Asia/Taipei')
+    //         ->toDateTimeString()
+    //     ;
+    // }
+    // public function getDealDateAttribute($value)
+    // {
+    //     return Carbon::createFromTimestamp(strtotime($value))
+    //         ->timezone('Asia/Taipei')
+    //         ->toDateTimeString()
+    //     ;
+    // }
 }

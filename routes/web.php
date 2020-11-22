@@ -11,6 +11,18 @@
 |
 */
 
-Route::get('/', function () {
-    return 'API';
-});
+// Route::get('/', function () {
+//     return 'API';
+// });
+
+// Route::get('/{path}', function () {
+//     return view('index');
+// })->where('path', '^((?!api).)*$');
+
+// Route::any('/.well-known/acme-challenge/{all}', function () {
+//     return 'ok';
+// });
+
+Route::any('{all}', function () {
+    return view('index');
+})->where(['all' => '.*']);

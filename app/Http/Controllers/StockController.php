@@ -55,4 +55,14 @@ class StockController extends Controller
 
         return response()->json($data);
     }
+
+    public function getStockList(Request $request) {
+        try {
+            $data = $this->service->getStockList();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($data);
+    }
 }
