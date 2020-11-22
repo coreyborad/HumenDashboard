@@ -33,7 +33,7 @@
           v-model="form.cost"
           :precision="2"
           controls-position="right"
-          :min="1"
+          :min="0"
         />
       </el-form-item>
     </el-form>
@@ -95,12 +95,17 @@ export default {
       try {
         await createUserStock(this.form)
         this.$emit('add')
-        this.$emit('update:visible', false)
+        this.close()
       } catch (error) {
         this.$message.error(error)
       }
     },
     close() {
+      this.form = {
+        stock_number: null,
+        shares: 0,
+        cost: 0
+      }
       this.$emit('update:visible', false)
     }
   }
