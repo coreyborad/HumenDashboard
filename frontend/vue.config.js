@@ -6,7 +6,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = defaultSettings.title || 'vue Admin Template' // page title
+const name = defaultSettings.title || 'Dashboard' // page title
 
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
@@ -28,6 +28,7 @@ module.exports = {
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
+  indexPath: process.env.NODE_ENV === 'production' ? 'index.blade.php' : 'index.html',
   productionSourceMap: false,
   devServer: {
     port: port,
