@@ -4,60 +4,137 @@ namespace App\Services;
 
 use App\Exceptions\ErrorException;
 use App\Repositories\MakeupInfoRepository;
-use App\Repositories\MakeupPriceRepository;
+use App\Repositories\MakeupCostRepository;
+use App\Repositories\MakeupSaleRepository;
 
 
 class MakeupService
 {
-    protected $makeupPriceRepository;
     protected $makeupInfoRepository;
+    protected $makeupCostRepository;
+    protected $makeupSaleRepository;
 
     public function __construct(
-        MakeupPriceRepository $makeupPriceRepository,
-        MakeupInfoRepository $makeupInfoRepository
+        MakeupInfoRepository $makeupInfoRepository,
+        MakeupCostRepository $makeupCostRepository,
+        MakeupSaleRepository $makeupSaleRepository
     )
     {
-        $this->makeupPriceRepository = $makeupPriceRepository;
         $this->makeupInfoRepository = $makeupInfoRepository;
+        $this->makeupCostRepository = $makeupCostRepository;
+        $this->makeupSaleRepository = $makeupSaleRepository;
     }
 
     public function getUserMakeupList(int $user_id)
     {
-        // $user_Makeup_list = $this->userHasMakeupRepository->with('Makeup_info')->findByField('user_id', $user_id);
-        // $user_Makeup_list = $user_Makeup_list->map(function($Makeup){
-        //     $last_Makeup = $this->MakeupHistoryRepository
-        //         ->where('Makeup_number', $Makeup->Makeup_number)
-        //         ->orderBy('deal_date', 'desc')
-        //         ->first();
-        //     $Makeup->last_Makeup = $last_Makeup;
-        //     return $Makeup;
-        // });
-        // return $user_Makeup_list;
+        $makeup_list = $this->makeupInfoRepository->select(['brand', 'name'])->groupBy(['name', 'brand'])->get();
+        $makeup_list = $makeup_list->map(function($makeup){
+            $makeup->cost_total = 0;
+            $makeup->cost_count = 0;
+            $makeup->sale_total = 0;
+            $makeup->sale_count = 0;
+            $makeup->income = 0;
+
+            $color_list = $this->makeupInfoRepository->with(['costs', 'sales', 'sales.cost'])->findWhere(
+                [
+                    'brand' => $makeup->brand,
+                    'name'  => $makeup->name
+                ]
+            );
+            $color_list->each(function($color) use($makeup){
+                $color->costs->each(function($cost) use($makeup){
+                    $makeup->cost_total += $cost->price * $cost->count;
+                    $makeup->cost_count += $cost->count;
+                });
+
+                $color->sales->each(function($sale) use($makeup){
+                    $makeup->sale_total += $sale->price * $sale->count;
+                    $makeup->sale_count += $sale->count;
+                });
+            });
+            $makeup->color_list = $color_list;
+            return $makeup;
+        });
+        return $makeup_list;
     }
 
-    public function createUserMakeup(int $user_id, array $data)
+    public function getMakeupByQuery(array $query = [])
     {
-        // try {
-        //     $data = $this->userHasMakeupRepository->create([
-        //         'user_id' => $user_id,
-        //         'Makeup_number' => $data['Makeup_number'],
-        //         'shares' => $data['shares'],
-        //         'cost' => $data['cost'],
-        //     ]);
-        // } catch (\Throwable $th) {
-        //     throw new ErrorException(500, 'error');
-        // }
-        // return $data;
+        $findList = [];
+        foreach ($query as $key => $value) {
+            array_push($findList, [$key, 'like', '%'. $value .'%']);
+        }
+        return $this->makeupInfoRepository->findWhere($findList);
     }
 
-    public function deleteUserMakeup(int $id)
+    public function createMakeupInfo(array $makeup_info)
     {
-        // try {
-        //     $data = $this->userHasMakeupRepository->delete($id);
-        // } catch (\Throwable $th) {
-        //     throw new ErrorException(500, 'error');
-        // }
-        // return $data;
+        try {
+            $data = $this->makeupInfoRepository->create($makeup_info);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, $th->getMessage());
+        }
+        return $data;
+    }
+
+    public function deleteMakeupInfo(int $id)
+    {
+        try {
+            $data = $this->makeupInfoRepository->delete($id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
+    }
+
+    public function updateMakeupInfo(int $id, array $makeup_info)
+    {
+        try {
+            $data = $this->makeupInfoRepository->update($makeup_info, $id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
+    }
+
+    public function createMakeupCost(array $cost_info)
+    {
+        try {
+            $data = $this->makeupCostRepository->create($cost_info);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, $th->getMessage());
+        }
+        return $data;
+    }
+
+    public function deleteMakeupCost(int $id)
+    {
+        try {
+            $data = $this->makeupCostRepository->delete($id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
+    }
+
+    public function createMakeupSale(array $cost_info)
+    {
+        try {
+            $data = $this->makeupCostRepository->create($cost_info);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, $th->getMessage());
+        }
+        return $data;
+    }
+
+    public function deleteMakeupSale(int $id)
+    {
+        try {
+            $data = $this->makeupCostRepository->delete($id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
     }
 
 }

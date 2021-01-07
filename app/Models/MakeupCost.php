@@ -4,19 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MakeupInfo extends Model
+class MakeupCost extends Model
 {
     protected $connection = 'mysql';
-    protected $table = 'makeup_info';
+    protected $table = 'makeup_cost';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'brand',
-        'name',
-        'color_name',
+        'makeup_id',
+        'makeup_cost_id',
+        'price',
+        'count',
+        'sold_date',
     ];
 
     /**
@@ -26,13 +28,4 @@ class MakeupInfo extends Model
      */
     protected $casts = [];
 
-    public function costs()
-    {
-        return $this->hasMany(MakeupCost::class, 'makeup_id', 'id');
-    }
-
-    public function sales()
-    {
-        return $this->hasMany(MakeupSale::class, 'makeup_id', 'id');
-    }
 }

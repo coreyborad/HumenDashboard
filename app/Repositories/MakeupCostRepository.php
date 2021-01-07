@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use App\Models\MakeupPrice;
+use App\Models\MakeupCost;
 use Prettus\Repository\Eloquent\BaseRepository;
 
-class MakeupPriceRepository extends BaseRepository
+class MakeupCostRepository extends BaseRepository
 {
     public function model(): string
     {
-        return MakeupPrice::class;
+        return MakeupCost::class;
     }
 
 }

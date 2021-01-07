@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class MakeupPrice extends Model
+class MakeupSale extends Model
 {
     protected $connection = 'mysql';
-    protected $table = 'makeup_price';
+    protected $table = 'makeup_sale';
     /**
      * The attributes that are mass assignable.
      *
@@ -15,10 +15,10 @@ class MakeupPrice extends Model
      */
     protected $fillable = [
         'makeup_id',
-        'cost_price',
-        'sale_price',
-        'inventory_count',
-        'sold_count',
+        'makeup_cost_id',
+        'price',
+        'count',
+        'order_date',
     ];
 
     /**
@@ -28,4 +28,8 @@ class MakeupPrice extends Model
      */
     protected $casts = [];
 
+    public function cost()
+    {
+        return $this->hasOne(MakeupCost::class, 'id', 'makeup_cost_id');
+    }
 }

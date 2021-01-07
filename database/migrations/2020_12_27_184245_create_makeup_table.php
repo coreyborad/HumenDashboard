@@ -22,15 +22,21 @@ class CreateMakeupTable extends Migration
 
             $table->unique(['brand', 'name', 'color_name']);
         });
-
-        Schema::create('makeup_price', function (Blueprint $table) {
+        Schema::create('makeup_cost', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('makeup_id');
-            $table->float('cost_price');
-            $table->float('sale_price');
-            $table->integer('inventory_count');
-            $table->integer('sold_count');
-            $table->timestamps();
+            $table->float('price');
+            $table->integer('count');
+            $table->timestamp('order_date');
+        });
+
+        Schema::create('makeup_sale', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->bigInteger('makeup_id');
+            $table->bigInteger('makeup_cost_id');
+            $table->float('price');
+            $table->integer('count');
+            $table->timestamp('sold_date');
         });
     }
 
@@ -41,7 +47,8 @@ class CreateMakeupTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('makeup');
-        Schema::dropIfExists('makeup_price');
+        Schema::dropIfExists('makeup_info');
+        Schema::dropIfExists('makeup_cost');
+        Schema::dropIfExists('makeup_sale');
     }
 }
