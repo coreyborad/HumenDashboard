@@ -115,3 +115,20 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+/**
+ * @param {string} url
+ * @returns {Object}
+ */
+export function toCurrency(num) {
+  if (isNaN(num)) {
+    return toCurrency(0)
+  }
+  if (num < 0) {
+    return '-' + toCurrency(Math.abs(num))
+  }
+  const parts = num.toString().split('.')
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+
+  return '$' + parts.join('.')
+}
