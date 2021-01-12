@@ -35,7 +35,7 @@ class MakeupService
             $makeup->sale_count = 0;
             $makeup->income = 0;
 
-            $color_list = $this->makeupInfoRepository->with(['costs', 'sales', 'sales.cost'])->findWhere(
+            $color_list = $this->makeupInfoRepository->with(['costs', 'sales'])->findWhere(
                 [
                     'brand' => $makeup->brand,
                     'name'  => $makeup->name
@@ -117,10 +117,10 @@ class MakeupService
         return $data;
     }
 
-    public function createMakeupSale(array $cost_info)
+    public function createMakeupSale(array $sale_info)
     {
         try {
-            $data = $this->makeupCostRepository->create($cost_info);
+            $data = $this->makeupSaleRepository->create($sale_info);
         } catch (\Throwable $th) {
             throw new ErrorException(500, $th->getMessage());
         }
@@ -130,7 +130,7 @@ class MakeupService
     public function deleteMakeupSale(int $id)
     {
         try {
-            $data = $this->makeupCostRepository->delete($id);
+            $data = $this->makeupSaleRepository->delete($id);
         } catch (\Throwable $th) {
             throw new ErrorException(500, 'error');
         }

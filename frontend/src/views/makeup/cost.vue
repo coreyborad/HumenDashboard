@@ -29,7 +29,12 @@
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="small" circle @click="updateCost(scope.row)" />
-            <el-button type="danger" icon="el-icon-delete" size="small" circle @click="deleteCost(scope.row)" />
+            <el-popconfirm
+              title="確定刪除?"
+              @onConfirm="deleteCost(scope.row)"
+            >
+              <el-button slot="reference" style="margin-left: 8px" type="danger" icon="el-icon-delete" size="small" circle />
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -66,8 +71,16 @@ export default {
   async created() {
   },
   methods: {
-    deleteCost(cost) {
-      console.log(cost)
+    async deleteCost(cost) {
+      try {
+        this.loading = true
+        await this.$store.dispatch('makeup/deleteMakeupCost', cost.id)
+        this.$message.success('刪除成功')
+        this.loading = false
+      } catch (error) {
+        this.$message.error(error)
+        this.loading = false
+      }
     },
     updateCost(cost) {
       console.log(cost)

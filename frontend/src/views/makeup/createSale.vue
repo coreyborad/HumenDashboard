@@ -1,7 +1,7 @@
 <template>
-  <el-dialog width="30%" title="成本列表" :visible="visible" :close-on-click-modal="false" @close="close">
+  <el-dialog width="30%" title="銷售列表" :visible="visible" :close-on-click-modal="false" @close="close">
     <el-form ref="form" :model="form" label-position="top" :rules="rules" label-width="100px">
-      <el-form-item label="單位成本" prop="price">
+      <el-form-item label="銷售單價" prop="price">
         <el-input-number
           v-model="form.price"
           style="width: 100%;"
@@ -17,9 +17,9 @@
           :min="0"
         />
       </el-form-item>
-      <el-form-item label="進貨日期" prop="order_date">
+      <el-form-item label="銷售日期" prop="sold_date">
         <el-date-picker
-          v-model="form.order_date"
+          v-model="form.sold_date"
           style="width: 100%;"
           type="date"
           placeholder="選擇日期"
@@ -53,7 +53,7 @@ export default {
         count: [
           { required: true, message: '請輸入文字', trigger: 'blur' }
         ],
-        order_date: [
+        sold_date: [
           { required: true, message: '請輸入文字', trigger: 'blur' }
         ]
       },
@@ -61,11 +61,15 @@ export default {
         makeup_id: 0,
         price: 0,
         count: 0,
-        order_date: this.moment()
+        sold_date: this.moment()
       }
     }
   },
   computed: {
+    costList() {
+      const list = this.$store.getters['makeup/costList']
+      return list
+    }
   },
   async created() {
   },
@@ -75,7 +79,7 @@ export default {
       if (valid) {
         try {
           this.form.makeup_id = this.$store.state.makeup.id
-          await this.$store.dispatch('makeup/createMakeupCost', this.form)
+          await this.$store.dispatch('makeup/createMakeupSale', this.form)
           this.$message.success('新增成功')
           this.$emit('update:visible', false)
         } catch (error) {

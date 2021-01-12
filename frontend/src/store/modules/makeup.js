@@ -1,4 +1,13 @@
-import { getMakeup, createMakeupInfo, deleteMakeupInfo, updateMakeupInfo } from '@/api/makeup'
+import {
+  getMakeup,
+  createMakeupInfo,
+  deleteMakeupInfo,
+  updateMakeupInfo,
+  createMakeupCost,
+  deleteMakeupCost,
+  createMakeupSale,
+  deleteMakeupSale
+} from '@/api/makeup'
 
 const getDefaultState = () => {
   return {
@@ -12,7 +21,7 @@ const getDefaultState = () => {
 
 const state = getDefaultState()
 const getters = {
-  colorList: state => () => {
+  colorList: state => {
     if (state.brand === '' || state.name === '') {
       return []
     }
@@ -22,7 +31,7 @@ const getters = {
       }
     }).color_list
   },
-  costList: (state, getters) => () => {
+  costList: (state, getters) => {
     if (state.color_name === '') {
       return []
     }
@@ -32,7 +41,7 @@ const getters = {
       }
     }).costs
   },
-  saleList: (state, getters) => () => {
+  saleList: (state, getters) => {
     if (state.color_name === '') {
       return []
     }
@@ -100,6 +109,46 @@ const actions = {
   updateMakeupInfo({ commit, dispatch }, form) {
     return new Promise((resolve, reject) => {
       updateMakeupInfo(form).then(response => {
+        dispatch('getList')
+        resolve(response.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  createMakeupCost({ commit, dispatch }, form) {
+    return new Promise((resolve, reject) => {
+      createMakeupCost(form).then(response => {
+        dispatch('getList')
+        resolve(response.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  deleteMakeupCost({ commit, dispatch }, id) {
+    return new Promise((resolve, reject) => {
+      deleteMakeupCost(id).then(response => {
+        dispatch('getList')
+        resolve(response.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  createMakeupSale({ commit, dispatch }, form) {
+    return new Promise((resolve, reject) => {
+      createMakeupSale(form).then(response => {
+        dispatch('getList')
+        resolve(response.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  deleteMakeupSale({ commit, dispatch }, id) {
+    return new Promise((resolve, reject) => {
+      deleteMakeupSale(id).then(response => {
         dispatch('getList')
         resolve(response.data)
       }).catch(error => {

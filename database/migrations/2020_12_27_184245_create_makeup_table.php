@@ -28,15 +28,16 @@ class CreateMakeupTable extends Migration
             $table->float('price');
             $table->integer('count');
             $table->timestamp('order_date');
+            $table->timestamps();
         });
 
         Schema::create('makeup_sale', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('makeup_id');
-            $table->bigInteger('makeup_cost_id');
             $table->float('price');
             $table->integer('count');
             $table->timestamp('sold_date');
+            $table->timestamps();
         });
     }
 

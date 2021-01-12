@@ -15,10 +15,9 @@ class MakeupCost extends Model
      */
     protected $fillable = [
         'makeup_id',
-        'makeup_cost_id',
         'price',
         'count',
-        'sold_date',
+        'order_date',
     ];
 
     /**
@@ -26,6 +25,7 @@ class MakeupCost extends Model
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+    ];
 
 }

@@ -15,10 +15,9 @@ class MakeupSale extends Model
      */
     protected $fillable = [
         'makeup_id',
-        'makeup_cost_id',
         'price',
         'count',
-        'order_date',
+        'sold_date',
     ];
 
     /**
@@ -26,10 +25,10 @@ class MakeupSale extends Model
      *
      * @var array
      */
-    protected $casts = [];
 
-    public function cost()
-    {
-        return $this->hasOne(MakeupCost::class, 'id', 'makeup_cost_id');
-    }
+
+    // public function cost()
+    // {
+    //     return $this->hasOne(MakeupCost::class, 'id', 'makeup_cost_id');
+    // }
 }

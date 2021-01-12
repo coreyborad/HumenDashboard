@@ -11,5 +11,5 @@ class MakeupCostRepository extends BaseRepository
     {
         return MakeupCost::class;
     }
-
+    
 }

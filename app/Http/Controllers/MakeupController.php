@@ -108,7 +108,7 @@ class MakeupController extends Controller
     }
 
     public function createMakeupSale(Request $request){
-        $param = ['makeup_id', 'makeup_cost_id', 'price', 'count', 'sold_date'];
+        $param = ['makeup_id', 'price', 'count', 'sold_date'];
         if (!$request->has($param)) {
             throw new ErrorException(400, 'error');
         }

@@ -47,7 +47,12 @@
           <template slot-scope="scope">
             <el-button size="small" @click="showCost(scope.row)">成本列表</el-button>
             <el-button size="small" @click="showSale(scope.row)">銷售列表</el-button>
-            <el-button type="danger" icon="el-icon-delete" size="small" circle @click="deleteColor(scope.row)" />
+            <el-popconfirm
+              title="確定刪除?"
+              @onConfirm="deleteColor(scope.row)"
+            >
+              <el-button slot="reference" style="margin-left: 8px" type="danger" icon="el-icon-delete" size="small" />
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
