@@ -5,8 +5,10 @@ import {
   updateMakeupInfo,
   createMakeupCost,
   deleteMakeupCost,
+  updateMakeupCost,
   createMakeupSale,
-  deleteMakeupSale
+  deleteMakeupSale,
+  updateMakeupSale
 } from '@/api/makeup'
 
 const getDefaultState = () => {
@@ -136,6 +138,16 @@ const actions = {
       })
     })
   },
+  updateMakeupCost({ commit, dispatch }, form) {
+    return new Promise((resolve, reject) => {
+      updateMakeupCost(form).then(response => {
+        dispatch('getList')
+        resolve(response.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   createMakeupSale({ commit, dispatch }, form) {
     return new Promise((resolve, reject) => {
       createMakeupSale(form).then(response => {
@@ -149,6 +161,16 @@ const actions = {
   deleteMakeupSale({ commit, dispatch }, id) {
     return new Promise((resolve, reject) => {
       deleteMakeupSale(id).then(response => {
+        dispatch('getList')
+        resolve(response.data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  updateMakeupSale({ commit, dispatch }, form) {
+    return new Promise((resolve, reject) => {
+      updateMakeupSale(form).then(response => {
         dispatch('getList')
         resolve(response.data)
       }).catch(error => {

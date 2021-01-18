@@ -28,7 +28,16 @@
         </el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="small" circle @click="updateCost(scope.row)" />
+            <el-popover
+              placement="right"
+              width="400"
+              trigger="click"
+              @show="setUpdateData(scope.row)"
+              >
+              <CostForm ref="form" :form.sync="form" />
+              <el-button type="primary" style="float: right;" size="small" @click="updateCost"> 更新 </el-button>
+              <el-button slot="reference" type="primary" icon="el-icon-edit" size="small" circle  />
+            </el-popover>
             <el-popconfirm
               title="確定刪除?"
               @onConfirm="deleteCost(scope.row)"
@@ -45,10 +54,13 @@
 
 <script>
 import CreateCost from './createCost.vue'
+import { objClone } from '@/utils/index'
+import CostForm from './costForm'
 
 export default {
   components: {
-    CreateCost
+    CreateCost,
+    CostForm
   },
   props: {
     visible: {
@@ -59,7 +71,13 @@ export default {
   data() {
     return {
       loading: false,
-      createCostVisible: false
+      createCostVisible: false,
+      form: {
+        id: 0,
+        price: 0,
+        count: 0,
+        order_date: new Date()
+      }
     }
   },
   computed: {
@@ -86,8 +104,21 @@ export default {
       this.createCostVisible = true
       this.$refs['createCost'].setDefault()
     },
-    updateCost(cost) {
-      console.log(cost)
+    setUpdateData(data) {
+      this.form = objClone(data)
+    },
+    async updateCost() {
+      const valid = await this.$refs['form'].validate()
+      if (valid) {
+        try {
+          const data = objClone(this.form)
+          data.order_date = this.moment(data.order_date).format('YYYY-MM-DD')
+          await this.$store.dispatch('makeup/updateMakeupCost', data)
+          this.$message.success('更新成功')
+        } catch (error) {
+          this.$message.error(error)
+        }
+      }
     },
     close() {
       this.$emit('update:visible', false)

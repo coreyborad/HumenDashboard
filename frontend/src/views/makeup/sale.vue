@@ -28,7 +28,17 @@
         </el-table-column>
         <el-table-column align="center" label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="small" circle @click="updateSale(scope.row)" />
+            <!-- <el-button type="primary" icon="el-icon-edit" size="small" circle @click="updateSale(scope.row)" /> -->
+            <el-popover
+              placement="right"
+              width="400"
+              trigger="click"
+              @show="setUpdateData(scope.row)"
+              >
+              <SaleForm ref="form" :form.sync="form" />
+              <el-button type="primary" style="float: right;" size="small" @click="updateSale"> 更新 </el-button>
+              <el-button slot="reference" type="primary" icon="el-icon-edit" size="small" circle  />
+            </el-popover>
             <el-popconfirm
               title="確定刪除?"
               @onConfirm="deleteSale(scope.row)"
@@ -48,10 +58,13 @@
 
 <script>
 import CreateSale from './createSale'
+import { objClone } from '@/utils/index'
+import SaleForm from './saleForm'
 
 export default {
   components: {
-    CreateSale
+    CreateSale,
+    SaleForm
   },
   props: {
     visible: {
@@ -62,7 +75,13 @@ export default {
   data() {
     return {
       loading: false,
-      createSaleVisible: false
+      createSaleVisible: false,
+      form: {
+        makeup_id: 0,
+        price: 0,
+        count: 0,
+        sold_date: new Date()
+      }
     }
   },
   computed: {
@@ -89,8 +108,21 @@ export default {
       this.createSaleVisible = true
       this.$refs['createSale'].setDefault()
     },
-    updateSale(sale) {
-      console.log(sale)
+    setUpdateData(data) {
+      this.form = objClone(data)
+    },
+    async updateSale() {
+      const valid = await this.$refs['form'].validate()
+      if (valid) {
+        try {
+          const data = objClone(this.form)
+          data.sold_date = this.moment(data.sold_date).format('YYYY-MM-DD')
+          await this.$store.dispatch('makeup/updateMakeupSale', data)
+          this.$message.success('更新成功')
+        } catch (error) {
+          this.$message.error(error)
+        }
+      }
     },
     close() {
       this.$emit('update:visible', false)
