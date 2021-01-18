@@ -81,6 +81,18 @@ class MakeupService
     {
         try {
             $data = $this->makeupInfoRepository->delete($id);
+            // 尋找cost跟sale
+            $costs = $this->makeupCostRepository->deleteWhere(
+                [
+                    'makeup_id' => $id
+                ]
+            );
+            $sales = $this->makeupSaleRepository->deleteWhere(
+                [
+                    'makeup_id' => $id
+                ]
+            );
+
         } catch (\Throwable $th) {
             throw new ErrorException(500, 'error');
         }
@@ -117,6 +129,16 @@ class MakeupService
         return $data;
     }
 
+    public function updateMakeupCost(int $id, array $cost_info)
+    {
+        try {
+            $data = $this->makeupCostRepository->update($cost_info, $id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
+    }
+
     public function createMakeupSale(array $sale_info)
     {
         try {
@@ -131,6 +153,16 @@ class MakeupService
     {
         try {
             $data = $this->makeupSaleRepository->delete($id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
+    }
+
+    public function updateMakeupSale(int $id, array $sale_info)
+    {
+        try {
+            $data = $this->makeupSaleRepository->update($sale_info, $id);
         } catch (\Throwable $th) {
             throw new ErrorException(500, 'error');
         }

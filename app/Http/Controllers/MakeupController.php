@@ -77,7 +77,7 @@ class MakeupController extends Controller
             throw $e;
         }
 
-    return response()->json($data);
+        return response()->json($data);
     }
 
     public function createMakeupCost(Request $request){
@@ -107,6 +107,21 @@ class MakeupController extends Controller
         return response()->json($data);
     }
 
+    public function updateMakeupCost(Request $request, int $id){
+        $param = ['price', 'count', 'order_date'];
+        if (!$request->has($param)) {
+            throw new ErrorException(400, 'error');
+        }
+        try {
+            $cost_info = $request->only($param);
+            $data = $this->service->updateMakeupCost($id, $cost_info);
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($data);
+    }
+
     public function createMakeupSale(Request $request){
         $param = ['makeup_id', 'price', 'count', 'sold_date'];
         if (!$request->has($param)) {
@@ -127,6 +142,21 @@ class MakeupController extends Controller
 
         try {
             $data = $this->service->deleteMakeupSale($id);
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($data);
+    }
+
+    public function updateMakeupSale(Request $request, int $id){
+        $param = ['price', 'count', 'sold_date'];
+        if (!$request->has($param)) {
+            throw new ErrorException(400, 'error');
+        }
+        try {
+            $sale_info = $request->only($param);
+            $data = $this->service->updateMakeupSale($id, $sale_info);
         } catch (\Exception $e) {
             throw $e;
         }
