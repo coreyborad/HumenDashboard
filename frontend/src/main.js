@@ -17,6 +17,10 @@ import '@/permission' // permission control
 import vSelect from 'vue-select'
 Vue.component('v-select', vSelect)
 import 'vue-select/dist/vue-select.css'
+
+import moment from 'moment'
+
+import { toCurrency } from '@/utils'
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
@@ -36,6 +40,9 @@ Vue.use(ElementUI, { locale })
 // Vue.use(ElementUI)
 
 Vue.config.productionTip = false
+
+Vue.prototype.moment = moment
+Vue.prototype.$_toCurrency = toCurrency
 
 new Vue({
   el: '#app',

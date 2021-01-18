@@ -51,7 +51,7 @@ return [
     /*
      * Sets the Access-Control-Max-Age response header when > 0.
      */
-    'max_age' => 0,
+    'max_age' => 3600,
 
     /*
      * Sets the Access-Control-Allow-Credentials header.

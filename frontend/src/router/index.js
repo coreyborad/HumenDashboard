@@ -56,7 +56,7 @@ export const constantRoutes = [
   {
     path: '/stock',
     component: Layout,
-    redirect: '/stock/table',
+    redirect: '/stock/ownstock',
     name: 'Stock',
     meta: { title: 'Stock', icon: 'el-icon-odometer' },
     children: [
@@ -65,6 +65,33 @@ export const constantRoutes = [
         name: 'OwnStock',
         component: () => import('@/views/ownstock/index'),
         meta: { title: 'OwnStock', icon: 'table' }
+      }
+      // {
+      //   path: 'tree',
+      //   name: 'Tree',
+      //   component: () => import('@/views/tree/index'),
+      //   meta: { title: 'Tree', icon: 'tree' }
+      // }
+    ]
+  },
+  {
+    path: '/makeup',
+    component: Layout,
+    redirect: '/makeup/pricelist',
+    name: 'Makeup',
+    meta: { title: 'Makeup', icon: 'el-icon-odometer' },
+    children: [
+      {
+        path: 'pricelist',
+        name: 'PriceList',
+        component: () => import('@/views/makeup/index'),
+        meta: { title: 'PriceList', icon: 'table' }
+      },
+      {
+        path: 'reports',
+        name: 'Reports',
+        component: () => import('@/views/makeup/index'),
+        meta: { title: 'Reports', icon: 'table' }
       }
       // {
       //   path: 'tree',
