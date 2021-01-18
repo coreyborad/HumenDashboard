@@ -132,3 +132,39 @@ export function toCurrency(num) {
 
   return '$' + parts.join('.')
 }
+
+export function objClone(obj) {
+  var copy;
+
+  // Handle the 3 simple types, and null or undefined
+  if (obj == null || typeof obj !== "object") return obj;
+
+  // Handle Date
+  if (obj instanceof Date) {
+    copy = new Date();
+    copy.setTime(obj.getTime());
+    return copy;
+  }
+
+  // Handle Array
+  if (obj instanceof Array) {
+    copy = [];
+    for (var i = 0, len = obj.length; i < len; i++) {
+      copy[i] = objClone(obj[i]);
+    }
+    return copy;
+  }
+
+  // Handle Object
+  if (obj instanceof Object) {
+    copy = {};
+    for (var attr in obj) {
+      if (obj.hasOwnProperty(attr)) copy[attr] = objClone(obj[attr]);
+    }
+    return copy;
+  }
+
+  return JSON.parse(JSON.stringify(obj));
+
+  // throw new Error("Unable to copy obj! Its type isn't supported.")
+}

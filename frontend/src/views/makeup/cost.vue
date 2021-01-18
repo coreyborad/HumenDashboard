@@ -1,8 +1,8 @@
 <template>
   <div>
-    <el-dialog title="成本列表" :visible="visible" :close-on-click-modal="false" @close="close">
+    <el-dialog title="成本列表" v-if="visible" :visible="true" :close-on-click-modal="false" @close="close">
       <div class="tooltips">
-        <el-button type="primary" size="small" @click="createCostVisible = true">新增進貨</el-button>
+        <el-button type="primary" size="small" @click="createCost">新增進貨</el-button>
       </div>
       <el-table
         v-loading="loading"
@@ -39,7 +39,7 @@
         </el-table-column>
       </el-table>
     </el-dialog>
-    <CreateCost :visible.sync="createCostVisible" />
+    <CreateCost ref="createCost" :visible.sync="createCostVisible" />
   </div>
 </template>
 
@@ -81,6 +81,10 @@ export default {
         this.$message.error(error)
         this.loading = false
       }
+    },
+    createCost() {
+      this.createCostVisible = true
+      this.$refs['createCost'].setDefault()
     },
     updateCost(cost) {
       console.log(cost)

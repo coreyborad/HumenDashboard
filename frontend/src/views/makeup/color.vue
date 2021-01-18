@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog width="80%" title="色號詳細資訊" :visible="visible" :close-on-click-modal="false" @close="close">
+    <el-dialog width="80%" title="色號詳細資訊" v-if="visible" :visible="true" :close-on-click-modal="false" @close="close">
       <!-- <div class="tooltips">
       <el-button type="primary" size="small" @click="stockDialogVisible = true">新增持有股票</el-button>
     </div> -->
@@ -132,9 +132,9 @@ export default {
     async deleteColor(color) {
       this.loading = true
       try {
-        await this.$store.dispatch('makeup/deleteMakeupInfo', color.id)
+        const colorList = await this.$store.dispatch('makeup/deleteMakeupInfo', color.id)
         this.$message.success('刪除成功')
-        if (this.colorList.length <= 0) {
+        if (this.colorList.length <= 1) {
           this.$emit('update:visible', false)
         }
       } catch (error) {

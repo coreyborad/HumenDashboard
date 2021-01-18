@@ -1,5 +1,5 @@
 <template>
-  <el-dialog width="30%" title="成本列表" :visible="visible" :close-on-click-modal="false" @close="close">
+  <el-dialog width="30%" title="成本列表" v-if="visible" :visible="true" :close-on-click-modal="false" @close="close">
     <el-form ref="form" :model="form" label-position="top" :rules="rules" label-width="100px">
       <el-form-item label="單位成本" prop="price">
         <el-input-number
@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { objClone } from '@/utils/index'
+
 export default {
   components: {
   },
@@ -61,7 +63,7 @@ export default {
         makeup_id: 0,
         price: 0,
         count: 0,
-        order_date: this.moment()
+        order_date: new Date()
       }
     }
   },
@@ -70,12 +72,22 @@ export default {
   async created() {
   },
   methods: {
+    setDefault() {
+      this.form = {
+        makeup_id: 0,
+        price: 0,
+        count: 0,
+        order_date: new Date()
+      }
+    },
     async save() {
       const valid = await this.$refs['form'].validate()
       if (valid) {
         try {
-          this.form.makeup_id = this.$store.state.makeup.id
-          await this.$store.dispatch('makeup/createMakeupCost', this.form)
+          const data = objClone(this.form)
+          data.makeup_id = this.$store.state.makeup.id
+          data.order_date = this.moment(data.order_date).format('YYYY-MM-DD')
+          await this.$store.dispatch('makeup/createMakeupCost', data)
           this.$message.success('新增成功')
           this.$emit('update:visible', false)
         } catch (error) {
