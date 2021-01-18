@@ -38,12 +38,13 @@ export default {
   },
   data() {
     return {
-      val: this.value
+      val: ''
     }
   },
   computed: {
   },
   async created() {
+    this.val = this.value
   },
   methods: {
     // todo 更換form

@@ -93,8 +93,9 @@ export default {
       await this.$store.dispatch('makeup/setCurrentValue', { target: 'name', value: data.name })
       this.colorDialogVisible = true
     },
-    createItemDialog() {
+    async createItemDialog() {
       this.itemDialogVisible = true
+      this.$refs['itemDialog'].setDefault()
     }
   }
 }

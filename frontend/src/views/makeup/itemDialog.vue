@@ -1,8 +1,9 @@
 <template>
-  <el-dialog :title="title" width="50%" :visible="visible" :close-on-click-modal="false" @close="close">
+  <el-dialog v-loading="loading" :title="title" width="50%" v-if="visible" :visible="true" :close-on-click-modal="false" @close="close">
     <el-form ref="form" :model="form" label-position="top" :rules="rules" label-width="100px">
       <el-form-item label="品牌" prop="brand">
         <querySearch
+          refs="queryBrand"
           v-model="form.brand"
           :target="'brand'"
           :disabled="active !== 1"
@@ -11,6 +12,7 @@
       </el-form-item>
       <el-form-item label="品項" prop="name">
         <querySearch
+          refs="queryName"
           v-model="form.name"
           :target="'name'"
           :brand="form.brand"
@@ -19,7 +21,7 @@
         />
       </el-form-item>
       <el-form-item label="色號" prop="color_name">
-        <el-input v-model="form.color_name" placeholder="請輸入內容" />
+        <el-input :disabled="active !== 3" v-model="form.color_name" placeholder="請輸入內容" />
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -76,6 +78,15 @@ export default {
   async created() {
   },
   methods: {
+    setDefault() {
+      this.active = 1
+      this.form = {
+        id: 0,
+        name: '',
+        brand: '',
+        color_name: ''
+      }
+    },
     async next() {
       switch (this.active) {
         case 1: {
@@ -100,10 +111,13 @@ export default {
       const valid = await this.$refs['form'].validate()
       if (valid) {
         try {
+          this.loading = true
           await this.$store.dispatch('makeup/createMakeupInfo', this.form)
+          this.loading = false
           this.$message.success('新增成功')
           this.$emit('update:visible', false)
         } catch (error) {
+          this.loading = false
           this.$message.error(error)
         }
       }
