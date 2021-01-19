@@ -65,4 +65,19 @@ class StockController extends Controller
 
         return response()->json($data);
     }
+
+    public function updateUserStock(Request $request, int $id){
+        $param = ['stock_number', 'shares', 'cost'];
+        if (!$request->has($param)) {
+            throw new ErrorException(400, 'error');
+        }
+        try {
+            $info = $request->only($param);
+            $data = $this->service->updateUserStock($id, $info);
+        } catch (\Exception $e) {
+            throw $e;
+        }
+
+        return response()->json($data);
+    }
 }

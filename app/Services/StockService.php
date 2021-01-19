@@ -73,4 +73,14 @@ class StockService
         }
         return $data;
     }
+
+    public function updateUserStock(int $id, array $info)
+    {
+        try {
+            $data = $this->userHasStockRepository->update($info, $id);
+        } catch (\Throwable $th) {
+            throw new ErrorException(500, 'error');
+        }
+        return $data;
+    }
 }
