@@ -6,7 +6,7 @@
       </div>
       <div>
         搜尋
-        <el-input style="width: 250px; margin-right: 12px;" v-model="search" placeholder=""></el-input>
+        <el-input style="width: 250px; margin-right: 12px;" v-model="search" @input="searchChange" placeholder=""></el-input>
       </div>
     </div>
     <el-table
@@ -130,6 +130,9 @@ export default {
     },
     handleCurrentChange(currentPage) {
       this.currentPage = currentPage
+    },
+    searchChange(){
+      this.currentPage = 1
     }
   }
 }
