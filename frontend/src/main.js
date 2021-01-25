@@ -19,6 +19,9 @@ Vue.component('v-select', vSelect)
 import 'vue-select/dist/vue-select.css'
 
 import moment from 'moment'
+import ECharts from 'vue-echarts'
+import 'echarts/lib/chart/bar'
+import 'echarts/lib/component/tooltip'
 
 import { toCurrency } from '@/utils'
 /**
@@ -43,6 +46,8 @@ Vue.config.productionTip = false
 
 Vue.prototype.moment = moment
 Vue.prototype.$_toCurrency = toCurrency
+
+Vue.component('v-chart', ECharts)
 
 new Vue({
   el: '#app',
