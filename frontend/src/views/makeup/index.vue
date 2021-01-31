@@ -1,7 +1,13 @@
 <template>
   <div class="app-container">
     <div class="tooltips">
-      <el-button type="primary" size="small" @click="createItemDialog">新增品項</el-button>
+      <div style="float:right;">
+        <el-button type="primary" size="small" @click="createItemDialog">新增品項</el-button>
+      </div>
+      <div>
+        搜尋
+        <el-input style="width: 250px; margin-right: 12px;" v-model="search" @input="searchChange" placeholder=""></el-input>
+      </div>
     </div>
     <el-table
       v-loading="loading"
@@ -10,12 +16,12 @@
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="品牌">
+      <el-table-column align="center" width="200" label="品牌">
         <template slot-scope="scope">
           {{ scope.row.brand }}
         </template>
       </el-table-column>
-      <el-table-column align="center" label="品項">
+      <el-table-column align="center" width="400" label="品項">
         <template slot-scope="scope">
           {{ scope.row.name }}
         </template>
@@ -51,6 +57,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      style="margin: 8px 0px; float:right;"
+      @current-change="handleCurrentChange"
+      background
+      layout="prev, pager, next"
+      :total="filterList.length">
+    </el-pagination>
     <ColorDialog ref="colorDialog" :visible.sync="colorDialogVisible" />
     <ItemDialog ref="itemDialog" :visible.sync="itemDialogVisible" />
   </div>
@@ -71,12 +84,30 @@ export default {
     return {
       colorDialogVisible: false,
       itemDialogVisible: false,
-      loading: true
+      loading: true,
+      currentPage: 1,
+      search: ''
     }
   },
   computed: {
+    filterList() {
+      return this.$store.state.makeup.list.filter(l => {
+        if (this.search === '') {
+          return true
+        }
+        if (l.brand.indexOf(this.search) !== -1) {
+          return true
+        }
+        if (l.name.indexOf(this.search) !== -1) {
+          return true
+        }
+        return false
+      })
+    },
     list() {
-      return this.$store.state.makeup.list
+      const pagesize = 10
+      
+      return this.filterList.slice((this.currentPage - 1) *pagesize, this.currentPage * pagesize)
     }
   },
   created() {
@@ -96,6 +127,12 @@ export default {
     async createItemDialog() {
       this.itemDialogVisible = true
       this.$refs['itemDialog'].setDefault()
+    },
+    handleCurrentChange(currentPage) {
+      this.currentPage = currentPage
+    },
+    searchChange(){
+      this.currentPage = 1
     }
   }
 }
@@ -103,7 +140,8 @@ export default {
 
 <style lang="scss" scoped>
   .tooltips {
+    width: 100%;
     margin-bottom: 16px;
-    float:right;
+    // float:right;
   }
 </style>

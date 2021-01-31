@@ -35,6 +35,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::get('', 'StockController@getUserStock');
             Route::post('', 'StockController@createUserStock');
             Route::delete('{id}', 'StockController@deleteUserStock');
+            Route::patch('{id}', 'StockController@updateUserStock');
         });
 
         // Makeup

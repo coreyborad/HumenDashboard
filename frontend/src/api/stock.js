@@ -8,17 +8,4 @@ export const deleteUserStock = async(id) => await request.delete('user_stock/' +
 
 export const getStockList = async() => await request.get('stock')
 
-// export function getInfo(token) {
-//   return request({
-//     url: '/vue-admin-template/user/info',
-//     method: 'get',
-//     params: { token }
-//   })
-// }
-
-// export function logout() {
-//   return request({
-//     url: '/vue-admin-template/user/logout',
-//     method: 'post'
-//   })
-// }
+export const updateUserStock = async (data) => await request.patch('user_stock/' + data.id, data)

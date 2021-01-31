@@ -90,7 +90,7 @@ export const constantRoutes = [
       {
         path: 'reports',
         name: 'Reports',
-        component: () => import('@/views/makeup/index'),
+        component: () => import('@/views/makeup/report/index'),
         meta: { title: 'Reports', icon: 'table' }
       }
       // {

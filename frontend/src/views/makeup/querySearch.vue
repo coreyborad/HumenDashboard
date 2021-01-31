@@ -67,7 +67,7 @@ export default {
               name: queryString
             }
             const temp = await getMakeupByQuery(qs)
-            data = temp.map(r => { return { value: r.name } })
+            data = temp.map(r => { return { value: r.name } }).filter((v, i, a) => a.findIndex(t => (t.value === v.value)) === i)
             break
           }
         }

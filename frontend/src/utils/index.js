@@ -124,6 +124,10 @@ export function toCurrency(num) {
   if (isNaN(num)) {
     return toCurrency(0)
   }
+
+  // 進到小數點2位
+  num = Math.round(num * 100) / 100
+
   if (num < 0) {
     return '-' + toCurrency(Math.abs(num))
   }
