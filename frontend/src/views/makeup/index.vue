@@ -95,13 +95,10 @@ export default {
         if (this.search === '') {
           return true
         }
-        // 先搜尋brand
-
-        if (l.brand.toUpperCase().indexOf(this.search.toUpperCase()) !== -1) {
+        if (l.brand.indexOf(this.search) !== -1) {
           return true
         }
-        // 在搜尋name
-        if (l.name.toUpperCase().indexOf(this.search.toUpperCase()) !== -1) {
+        if (l.name.indexOf(this.search) !== -1) {
           return true
         }
         return false
