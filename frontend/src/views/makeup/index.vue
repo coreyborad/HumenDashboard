@@ -95,10 +95,10 @@ export default {
         if (this.search === '') {
           return true
         }
-        if (l.brand.indexOf(this.search) !== -1) {
+        if (l.brand.toUpperCase().indexOf(this.search.toUpperCase()) !== -1) {
           return true
         }
-        if (l.name.indexOf(this.search) !== -1) {
+        if (l.name.toUpperCase().indexOf(this.search.toUpperCase()) !== -1) {
           return true
         }
         return false
