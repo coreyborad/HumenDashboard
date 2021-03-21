@@ -1,0 +1,88 @@
+version: '3'
+networks:
+  dashboard:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+services:
+### NGINX Server #########################################
+  nginx:
+    build:
+      context: ./nginx
+      args:
+        - CHANGE_SOURCE=false
+        - PHP_UPSTREAM_CONTAINER=php-fpm
+        - PHP_UPSTREAM_PORT=9000
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    volumes:
+      - ./backend/makeup/:/var/www/makeup:cached
+      - ./frontend/dist/:/var/www/static:cached
+      - ./logs/nginx/:/var/log/nginx
+      - ./nginx/sites/:/etc/nginx/sites-available
+      - ./nginx/ssl/:/etc/nginx/ssl
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php-fpm
+      - go-stock
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.2
+  go-stock:
+    image: golang:1.15-alpine
+    volumes:
+      - ./backend/stock/:/go:cached
+    ports:
+      - "80"
+    environment:
+      - TZ=Asia/Taipei
+    command: tail -f /dev/null
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.3
+  php-fpm:
+    build:
+      context: ./php-fpm
+      args:
+        - CHANGE_SOURCE=false
+    volumes:
+      - ./backend/makeup/:/var/www:cached
+    environment:
+      - TZ=Asia/Taipei
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.4
+  mysql:
+    build:
+      context: ./mysql
+      args:
+        - MYSQL_VERSION=latest
+    environment:
+      - MYSQL_DATABASE=dashboard
+      - MYSQL_USER=default
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+      - TZ=Asia/Taipei
+    volumes:
+      - ~/.dashboard/data/mysql:/var/lib/mysql
+      - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.5
+  mongo:
+    build: ./mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ~/.dashboard/data/mongo:/data/db
+      - ~/.dashboard/data/mongo_config:/data/configdb
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.6

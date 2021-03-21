@@ -28,7 +28,8 @@ module.exports = {
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: process.env.NODE_ENV === 'development',
-  indexPath: process.env.NODE_ENV === 'production' ? 'index.blade.php' : 'index.html',
+  // indexPath: process.env.NODE_ENV === 'production' ? 'index.blade.php' : 'index.html',
+  indexPath: process.env.NODE_ENV === 'production' ? 'index.html' : '',
   productionSourceMap: false,
   devServer: {
     port: port,
