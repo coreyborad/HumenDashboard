@@ -51,6 +51,7 @@ export default {
             },
             formatter: datas => {
               return `
+              ${datas[0].axisValueLabel}<br/>
               ${datas[0].marker} ${datas[0].seriesName} ${this.$_toCurrency(datas[0].value)}<br/>
               ${datas[1].marker} ${datas[1].seriesName} ${this.$_toCurrency(datas[1].value)}<br/>
               淨額: ${this.$_toCurrency(datas[1].value - datas[0].value)}

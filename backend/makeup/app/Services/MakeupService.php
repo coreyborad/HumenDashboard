@@ -178,17 +178,17 @@ class MakeupService
             });
         $diff_months = $start->diffInMonths($end);
         $result = [];
-        for ($i=0; $i < $diff_months; $i++) {
+        for ($i=0; $i <= $diff_months; $i++) {
             $key = '';
             // start
             if($i === 0){
                 $key = substr($start->toDateString(), 0, 7);
             }
             // end
-            else if($i === ($diff_months - 1)){
+            else if($i === $diff_months){
                 $key = substr($end->toDateString(), 0, 7);
             }else{
-                $key = substr($start->copy()->addMonths($i)->toDateString(), 0, 7);
+                $key = substr($start->copy()->addMonthNoOverflow($i)->toDateString(), 0, 7);
             }
             // 如果沒有資料，設定為0
             if (isset($data[$key])) {
@@ -217,17 +217,17 @@ class MakeupService
             });
         $diff_months = $start->diffInMonths($end);
         $result = [];
-        for ($i=0; $i < $diff_months; $i++) {
+        for ($i=0; $i <= $diff_months; $i++) {
             $key = '';
             // start
             if($i === 0){
                 $key = substr($start->toDateString(), 0, 7);
             }
             // end
-            else if($i === ($diff_months - 1)){
+            else if($i === $diff_months){
                 $key = substr($end->toDateString(), 0, 7);
             }else{
-                $key = substr($start->copy()->addMonths($i)->toDateString(), 0, 7);
+                $key = substr($start->copy()->addMonthNoOverflow($i)->toDateString(), 0, 7);
             }
             // 如果沒有資料，設定為0
             if (isset($data[$key])) {

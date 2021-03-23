@@ -173,8 +173,8 @@ class MakeupController extends Controller
         try {
             $query_string = $request->only($param);
             $start = Carbon::parse($query_string['date_start']);
-            $end = Carbon::parse($query_string['date_end']);
-            $diff_months = $start->floatDiffInMonths($end);
+            $end = Carbon::parse($query_string['date_end'])->endOfMonth();
+            $diff_months = $start->diffInMonths($end);
             if ($diff_months >= 12 || $diff_months <= 0){
                 throw new ErrorException(400, $diff_months);
             }
@@ -193,8 +193,8 @@ class MakeupController extends Controller
         try {
             $query_string = $request->only($param);
             $start = Carbon::parse($query_string['date_start']);
-            $end = Carbon::parse($query_string['date_end']);
-            $diff_months = $start->floatDiffInMonths($end);
+            $end = Carbon::parse($query_string['date_end'])->endOfMonth();
+            $diff_months = $start->diffInMonths($end);
             if ($diff_months >= 12 || $diff_months <= 0){
                 throw new ErrorException(400, $diff_months);
             }
