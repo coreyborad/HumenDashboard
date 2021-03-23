@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Services\MakeupService;
 use Illuminate\Http\Request;
 use App\Exceptions\ErrorException;
+use Carbon\Carbon;
 
 class MakeupController extends Controller
 {
@@ -161,6 +162,46 @@ class MakeupController extends Controller
             throw $e;
         }
 
+        return response()->json($data);
+    }
+
+    public function getCostByMonthRange(Request $request){
+        $param = ['date_start', 'date_end'];
+        if (!$request->has($param)) {
+            throw new ErrorException(400, 'error');
+        }
+        try {
+            $query_string = $request->only($param);
+            $start = Carbon::parse($query_string['date_start']);
+            $end = Carbon::parse($query_string['date_end']);
+            $diff_months = $start->floatDiffInMonths($end);
+            if ($diff_months >= 12 || $diff_months <= 0){
+                throw new ErrorException(400, $diff_months);
+            }
+            $data = $this->service->getMakeupCostByDate($start, $end);
+        } catch (\Exception $e) {
+            throw $e;
+        }
+        return response()->json($data);
+    }
+
+    public function getSaleByMonthRange(Request $request){
+        $param = ['date_start', 'date_end'];
+        if (!$request->has($param)) {
+            throw new ErrorException(400, 'error');
+        }
+        try {
+            $query_string = $request->only($param);
+            $start = Carbon::parse($query_string['date_start']);
+            $end = Carbon::parse($query_string['date_end']);
+            $diff_months = $start->floatDiffInMonths($end);
+            if ($diff_months >= 12 || $diff_months <= 0){
+                throw new ErrorException(400, $diff_months);
+            }
+            $data = $this->service->getMakeupSaleByDate($start, $end);
+        } catch (\Exception $e) {
+            throw $e;
+        }
         return response()->json($data);
     }
 }

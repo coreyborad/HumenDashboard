@@ -6,7 +6,7 @@ use App\Exceptions\ErrorException;
 use App\Repositories\MakeupInfoRepository;
 use App\Repositories\MakeupCostRepository;
 use App\Repositories\MakeupSaleRepository;
-
+use Carbon\Carbon;
 
 class MakeupService
 {
@@ -169,4 +169,82 @@ class MakeupService
         return $data;
     }
 
+    public function getMakeupCostByDate(Carbon $start, Carbon $end)
+    {
+        $data = $this->makeupCostRepository
+            ->findWhereBetween('order_date', [$start->toDateString(), $end->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return substr($item['order_date'], 0, 7);
+            });
+        $diff_months = $start->diffInMonths($end);
+        $result = [];
+        for ($i=0; $i < $diff_months; $i++) {
+            $key = '';
+            // start
+            if($i === 0){
+                $key = substr($start->toDateString(), 0, 7);
+            }
+            // end
+            else if($i === ($diff_months - 1)){
+                $key = substr($end->toDateString(), 0, 7);
+            }else{
+                $key = substr($start->copy()->addMonths($i)->toDateString(), 0, 7);
+            }
+            // 如果沒有資料，設定為0
+            if (isset($data[$key])) {
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+                foreach ($data[$key] as $record) {
+                    $result[$i]['price'] += $record->price;
+                }
+            }else{
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+            }
+        }
+        return $result;
+    }
+    public function getMakeupSaleByDate(Carbon $start, Carbon $end)
+    {
+        $data = $this->makeupSaleRepository
+            ->findWhereBetween('sold_date', [$start->toDateString(), $end->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return substr($item['sold_date'], 0, 7);
+            });
+        $diff_months = $start->diffInMonths($end);
+        $result = [];
+        for ($i=0; $i < $diff_months; $i++) {
+            $key = '';
+            // start
+            if($i === 0){
+                $key = substr($start->toDateString(), 0, 7);
+            }
+            // end
+            else if($i === ($diff_months - 1)){
+                $key = substr($end->toDateString(), 0, 7);
+            }else{
+                $key = substr($start->copy()->addMonths($i)->toDateString(), 0, 7);
+            }
+            // 如果沒有資料，設定為0
+            if (isset($data[$key])) {
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+                foreach ($data[$key] as $record) {
+                    $result[$i]['price'] += $record->price;
+                }
+            }else{
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+            }
+        }
+        return $result;
+    }
 }
