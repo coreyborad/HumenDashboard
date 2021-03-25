@@ -247,4 +247,46 @@ class MakeupService
         }
         return $result;
     }
+
+    public function getMakeupCostGroupByItemOnDate(Carbon $date)
+    {
+        $data = $this->makeupCostRepository
+            ->with('makeup')
+            ->findWhereBetween('order_date', [$date->copy()->startOfMonth()->toDateString(), $date->copy()->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return $item['makeup']['id'];
+            });
+        return $data;
+        // $diff_months = $start->diffInMonths($end);
+        // $result = [];
+        // for ($i=0; $i <= $diff_months; $i++) {
+        //     $key = '';
+        //     // start
+        //     if($i === 0){
+        //         $key = substr($start->toDateString(), 0, 7);
+        //     }
+        //     // end
+        //     else if($i === $diff_months){
+        //         $key = substr($end->toDateString(), 0, 7);
+        //     }else{
+        //         $key = substr($start->copy()->addMonthNoOverflow($i)->toDateString(), 0, 7);
+        //     }
+        //     // 如果沒有資料，設定為0
+        //     if (isset($data[$key])) {
+        //         $result[$i] = [
+        //             'month' => $key,
+        //             'price' => 0
+        //         ];
+        //         foreach ($data[$key] as $record) {
+        //             $result[$i]['price'] += $record->price;
+        //         }
+        //     }else{
+        //         $result[$i] = [
+        //             'month' => $key,
+        //             'price' => 0
+        //         ];
+        //     }
+        // }
+        // return $result;
+    }
 }

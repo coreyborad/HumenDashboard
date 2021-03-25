@@ -52,8 +52,7 @@ Route::group(['prefix' => 'v1'], function () {
             Route::delete('sale/{id}', 'MakeupController@deleteMakeupSale');
             Route::patch('sale/{id}', 'MakeupController@updateMakeupSale');
 
-            Route::get('cost', 'MakeupController@getCostByMonthRange');
-            Route::get('sale', 'MakeupController@getSaleByMonthRange');
+            Route::get('reports', 'MakeupController@getReports');
         });
     });
 });

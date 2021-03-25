@@ -48,6 +48,8 @@ Vue.prototype.moment = moment
 Vue.prototype.$_toCurrency = toCurrency
 
 Vue.component('v-chart', ECharts)
+import 'echarts/lib/component/legend'
+import 'echarts/lib/chart/pie'
 
 new Vue({
   el: '#app',

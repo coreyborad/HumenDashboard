@@ -28,4 +28,8 @@ class MakeupCost extends Model
     protected $casts = [
     ];
 
+    public function makeup()
+    {
+        return $this->hasOne(MakeupInfo::class, 'id', 'makeup_id');
+    }
 }

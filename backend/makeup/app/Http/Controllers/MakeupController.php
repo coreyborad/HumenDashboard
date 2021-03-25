@@ -31,7 +31,8 @@ class MakeupController extends Controller
 
     public function getMakeupByQuery(Request $request){
         try {
-            $query_string = $request->query();
+            $param = ['brand', 'name', 'color_name'];
+            $query_string = $request->only($param);
             $data = $this->service->getMakeupByQuery($query_string);
         } catch (\Exception $e) {
             throw $e;
@@ -165,43 +166,51 @@ class MakeupController extends Controller
         return response()->json($data);
     }
 
-    public function getCostByMonthRange(Request $request){
-        $param = ['date_start', 'date_end'];
-        if (!$request->has($param)) {
-            throw new ErrorException(400, 'error');
-        }
-        try {
-            $query_string = $request->only($param);
-            $start = Carbon::parse($query_string['date_start']);
-            $end = Carbon::parse($query_string['date_end'])->endOfMonth();
-            $diff_months = $start->diffInMonths($end);
-            if ($diff_months >= 12 || $diff_months <= 0){
-                throw new ErrorException(400, $diff_months);
+    public function getReports(Request $request){
+        $data = [];
+        // Option-a 月份範圍銷售額(全部商品)
+        $param = ['type', 'target', 'date_start', 'date_end'];
+        if ($request->has($param) && $request->input('type') === 'a') {
+            try {
+                $query_string = $request->only($param);
+                $start = Carbon::parse($query_string['date_start']);
+                $end = Carbon::parse($query_string['date_end'])->endOfMonth();
+                $diff_months = $start->diffInMonths($end);
+                if ($diff_months >= 12 || $diff_months <= 0){
+                    throw new ErrorException(400, $diff_months);
+                }
+                switch ($query_string['target']) {
+                    case 'cost':
+                        $data = $this->service->getMakeupCostByDate($start, $end);
+                        break;
+                    case 'sale':
+                        $data = $this->service->getMakeupSaleByDate($start, $end);
+                        break;
+                }
+                
+            } catch (\Exception $e) {
+                throw $e;
             }
-            $data = $this->service->getMakeupCostByDate($start, $end);
-        } catch (\Exception $e) {
-            throw $e;
         }
-        return response()->json($data);
-    }
+        // Option-b 單月份銷售狀況(以商品分類)
+        $param = ['type', 'target', 'date'];
+        if ($request->has($param) && $request->input('type') === 'b') {
+            try {
+                $query_string = $request->only($param);
+                $date = Carbon::parse($query_string['date']);
+                switch ($query_string['target']) {
+                    case 'cost':
+                        $data = $this->service->getMakeupCostGroupByItemOnDate($date);
+                        break;
+                    case 'sale':
+                        $data = $this->service->getMakeupCostGroupByItemOnDate($date);
+                        break;
+                }
+            } catch (\Exception $e) {
+                throw $e;
+            }
+        }
 
-    public function getSaleByMonthRange(Request $request){
-        $param = ['date_start', 'date_end'];
-        if (!$request->has($param)) {
-            throw new ErrorException(400, 'error');
-        }
-        try {
-            $query_string = $request->only($param);
-            $start = Carbon::parse($query_string['date_start']);
-            $end = Carbon::parse($query_string['date_end'])->endOfMonth();
-            $diff_months = $start->diffInMonths($end);
-            if ($diff_months >= 12 || $diff_months <= 0){
-                throw new ErrorException(400, $diff_months);
-            }
-            $data = $this->service->getMakeupSaleByDate($start, $end);
-        } catch (\Exception $e) {
-            throw $e;
-        }
         return response()->json($data);
     }
 }

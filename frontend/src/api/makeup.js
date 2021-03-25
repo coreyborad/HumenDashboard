@@ -22,6 +22,4 @@ export const deleteMakeupSale = async(id) => await request.delete('makeup/sale/'
 
 export const updateMakeupSale = async (data) => await request.patch('makeup/sale/' + data.id, data)
 
-export const getMakeupCostMonthByQuery = async(query) => await request.get('makeup/cost', { params: query })
-
-export const getMakeupSaleMonthByQuery = async(query) => await request.get('makeup/sale', { params: query })
+export const getReportsByQuery = async(query) => await request.get('makeup/reports', { params: query })
