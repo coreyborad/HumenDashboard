@@ -10,6 +10,7 @@
     </el-form-item>
     <el-form-item label="數量" prop="count">
       <el-input-number
+        :disabled="form.update"
         v-model="form.count"
         style="width: 100%;"
         controls-position="right"

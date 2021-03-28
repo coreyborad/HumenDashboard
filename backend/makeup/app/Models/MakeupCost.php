@@ -32,4 +32,9 @@ class MakeupCost extends Model
     {
         return $this->hasOne(MakeupInfo::class, 'id', 'makeup_id');
     }
+
+    public function hadSold()
+    {
+        return $this->hasMany(MakeupSaleCostRelate::class, 'cost_id', 'id');
+    }
 }

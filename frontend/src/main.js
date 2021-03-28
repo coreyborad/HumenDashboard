@@ -50,6 +50,7 @@ Vue.prototype.$_toCurrency = toCurrency
 Vue.component('v-chart', ECharts)
 import 'echarts/lib/component/legend'
 import 'echarts/lib/chart/pie'
+import 'echarts/lib/chart/line'
 
 new Vue({
   el: '#app',
