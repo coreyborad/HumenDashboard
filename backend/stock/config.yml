@@ -58,7 +58,7 @@ database:
     dbname: appuser
     password: secret
 mongodb:
-  host: 192.168.0.10
+  host: mongo
   port: 27017
   dbname: database
 swagger:
