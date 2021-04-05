@@ -3,12 +3,17 @@
     <transition name="fade-transform" mode="out-in">
       <router-view :key="key" />
     </transition>
+    <Chatbot />
   </section>
 </template>
 
 <script>
+import Chatbot from '@/components/Chatbot'
 export default {
   name: 'AppMain',
+  components: {
+    Chatbot
+  },
   computed: {
     key() {
       return this.$route.path

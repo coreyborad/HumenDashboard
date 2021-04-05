@@ -105,7 +105,9 @@ export default {
       this.$refs['createCost'].setDefault()
     },
     setUpdateData(data) {
-      this.form = objClone(data)
+      const updateData = objClone(data)
+      updateData.update = true
+      this.form = updateData
     },
     async updateCost() {
       const valid = await this.$refs['form'].validate()

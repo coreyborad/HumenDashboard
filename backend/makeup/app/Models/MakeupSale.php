@@ -26,9 +26,13 @@ class MakeupSale extends Model
      * @var array
      */
 
+    public function makeup()
+    {
+        return $this->hasOne(MakeupInfo::class, 'id', 'makeup_id');
+    }
 
-    // public function cost()
-    // {
-    //     return $this->hasOne(MakeupCost::class, 'id', 'makeup_cost_id');
-    // }
+    public function hadSold()
+    {
+        return $this->hasMany(MakeupSaleCostRelate::class, 'sale_id', 'id');
+    }
 }

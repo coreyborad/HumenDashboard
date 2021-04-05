@@ -21,3 +21,5 @@ export const createMakeupSale = async(data) => await request.post('makeup/sale',
 export const deleteMakeupSale = async(id) => await request.delete('makeup/sale/' + id)
 
 export const updateMakeupSale = async (data) => await request.patch('makeup/sale/' + data.id, data)
+
+export const getReportsByQuery = async(query) => await request.get('makeup/reports', { params: query })

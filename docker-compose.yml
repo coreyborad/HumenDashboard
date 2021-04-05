@@ -9,6 +9,7 @@ networks:
 services:
 ### NGINX Server #########################################
   nginx:
+    restart: always
     build:
       context: ./nginx
       args:
@@ -33,15 +34,31 @@ services:
     networks:
       dashboard:
         ipv4_address: 172.20.0.2
+  ### Dev go container #########################################      
+  # go-stock:
+  #   restart: always
+  #   build:
+  #     context: ./go
+  #   volumes:
+  #     - ./backend/stock/:/go/src/stock:cached
+  #   ports:
+  #     - "80"
+  #   environment:
+  #     - TZ=Asia/Taipei
+  #   command: tail -f /dev/null
+  #   networks:
+  #     dashboard:
+  #       ipv4_address: 172.20.0.3
+  ### Prod go container #########################################      
   go-stock:
-    image: golang:1.15-alpine
+    restart: always
+    build:
+      context: ./go
     volumes:
-      - ./backend/stock/:/go:cached
-    ports:
-      - "80"
+      - ./backend/stock/:/go/src/stock:cached
     environment:
       - TZ=Asia/Taipei
-    command: tail -f /dev/null
+    command: ./server.run start
     networks:
       dashboard:
         ipv4_address: 172.20.0.3

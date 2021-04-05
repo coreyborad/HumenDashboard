@@ -6,23 +6,27 @@ use App\Exceptions\ErrorException;
 use App\Repositories\MakeupInfoRepository;
 use App\Repositories\MakeupCostRepository;
 use App\Repositories\MakeupSaleRepository;
-
+use App\Repositories\MakeupSaleCostRelateRepository;
+use Carbon\Carbon;
 
 class MakeupService
 {
     protected $makeupInfoRepository;
     protected $makeupCostRepository;
     protected $makeupSaleRepository;
+    protected $makeupSaleCostRelateRepository;
 
     public function __construct(
         MakeupInfoRepository $makeupInfoRepository,
         MakeupCostRepository $makeupCostRepository,
-        MakeupSaleRepository $makeupSaleRepository
+        MakeupSaleRepository $makeupSaleRepository,
+        MakeupSaleCostRelateRepository $makeupSaleCostRelateRepository
     )
     {
         $this->makeupInfoRepository = $makeupInfoRepository;
         $this->makeupCostRepository = $makeupCostRepository;
         $this->makeupSaleRepository = $makeupSaleRepository;
+        $this->makeupSaleCostRelateRepository = $makeupSaleCostRelateRepository;
     }
 
     public function getUserMakeupList(int $user_id)
@@ -122,11 +126,22 @@ class MakeupService
     public function deleteMakeupCost(int $id)
     {
         try {
-            $data = $this->makeupCostRepository->delete($id);
+            $relates = $this->makeupSaleCostRelateRepository->findWhere([
+                'cost_id' => $id,
+            ]);
+            // 刪除有建立關係的銷售表
+            foreach ($relates as $relate) {
+                $this->makeupSaleRepository->delete($relate->sale_id);
+            }
+            // 刪除關係表
+            $this->makeupSaleCostRelateRepository->deleteWhere([
+                'cost_id' => $id,
+            ]);
+            $this->makeupCostRepository->delete($id);
         } catch (\Throwable $th) {
             throw new ErrorException(500, 'error');
         }
-        return $data;
+        return $relates;
     }
 
     public function updateMakeupCost(int $id, array $cost_info)
@@ -141,17 +156,65 @@ class MakeupService
 
     public function createMakeupSale(array $sale_info)
     {
+        //  ['makeup_id', 'price', 'count', 'sold_date']
         try {
-            $data = $this->makeupSaleRepository->create($sale_info);
+            // 先取得該產品庫存數量避免有庫存不夠，卻還賣東西的狀況
+            $inventory_status = $this->getMakeupInventory($sale_info['makeup_id']);
+            if($inventory_status['inventory'] < $sale_info['count']){
+                throw new ErrorException(500, 'error');
+            }
+            // 尋找要對應到的成本id
+            $remain = $sale_info['count'];
+            $cost_list = $this->makeupCostRepository
+                ->with(['hadSold'])
+                ->orderBy('order_date', 'asc')
+                ->findWhere(
+                    [
+                        'makeup_id' => $sale_info['makeup_id'],
+                    ]
+                );
+            $cost_list = $cost_list->filter(function($cost){
+                $rem = ($cost->count - $cost->hadSold->sum('relate_count'));
+                if($rem <= 0){
+                    return false;
+                }else{
+                    return true;
+                }
+            });
+            // 先新增銷售單
+            $sale = $this->makeupSaleRepository->create($sale_info);
+            // 新增至銷售成本關係表
+            foreach ($cost_list as $cost) {
+                if($remain > $cost->count){
+                    $remain = $remain - $cost->count;
+                    $this->makeupSaleCostRelateRepository->create([
+                        'cost_id' => $cost->id,
+                        'sale_id' => $sale->id,
+                        'relate_count' => $cost->count
+                    ]);
+                // 小於或等於時代表銷售數量已攤平完畢
+                } else {
+                    $this->makeupSaleCostRelateRepository->create([
+                        'cost_id' => $cost->id,
+                        'sale_id' => $sale->id,
+                        'relate_count' => $remain
+                    ]);
+                    break;
+                }
+            }
         } catch (\Throwable $th) {
             throw new ErrorException(500, $th->getMessage());
         }
-        return $data;
+        return $sale;
     }
 
     public function deleteMakeupSale(int $id)
     {
         try {
+            // 要先刪除成本銷售關聯表
+            $this->makeupSaleCostRelateRepository->deleteWhere([
+                'sale_id' => $id,
+            ]);
             $data = $this->makeupSaleRepository->delete($id);
         } catch (\Throwable $th) {
             throw new ErrorException(500, 'error');
@@ -169,4 +232,182 @@ class MakeupService
         return $data;
     }
 
+    public function getMakeupCostByDate(Carbon $start, Carbon $end)
+    {
+        $data = $this->makeupCostRepository
+            ->findWhereBetween('order_date', [$start->toDateString(), $end->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return substr($item['order_date'], 0, 7);
+            });
+        $diff_months = $start->diffInMonths($end);
+        $result = [];
+        for ($i=0; $i <= $diff_months; $i++) {
+            $key = '';
+            // start
+            if($i === 0){
+                $key = substr($start->toDateString(), 0, 7);
+            }
+            // end
+            else if($i === $diff_months){
+                $key = substr($end->toDateString(), 0, 7);
+            }else{
+                $key = substr($start->copy()->addMonthNoOverflow($i)->toDateString(), 0, 7);
+            }
+            // 如果沒有資料，設定為0
+            if (isset($data[$key])) {
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+                foreach ($data[$key] as $record) {
+                    $result[$i]['price'] += $record->price;
+                }
+            }else{
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+            }
+        }
+        return $result;
+    }
+    public function getMakeupSaleByDate(Carbon $start, Carbon $end)
+    {
+        $data = $this->makeupSaleRepository
+            ->findWhereBetween('sold_date', [$start->toDateString(), $end->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return substr($item['sold_date'], 0, 7);
+            });
+        $diff_months = $start->diffInMonths($end);
+        $result = [];
+        for ($i=0; $i <= $diff_months; $i++) {
+            $key = '';
+            // start
+            if($i === 0){
+                $key = substr($start->toDateString(), 0, 7);
+            }
+            // end
+            else if($i === $diff_months){
+                $key = substr($end->toDateString(), 0, 7);
+            }else{
+                $key = substr($start->copy()->addMonthNoOverflow($i)->toDateString(), 0, 7);
+            }
+            // 如果沒有資料，設定為0
+            if (isset($data[$key])) {
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+                foreach ($data[$key] as $record) {
+                    $result[$i]['price'] += $record->price;
+                }
+            }else{
+                $result[$i] = [
+                    'month' => $key,
+                    'price' => 0
+                ];
+            }
+        }
+        return $result;
+    }
+
+    public function getMakeupCostGroupByItemOnDate(Carbon $date)
+    {
+        $data = $this->makeupCostRepository
+            ->with('makeup')
+            ->findWhereBetween('order_date', [$date->copy()->startOfMonth()->toDateString(), $date->copy()->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return $item['makeup']['id'];
+            });
+        return $data;
+    }
+
+    public function getMakeupInventory(Int $makeup_id)
+    {
+        $cost_list = $this->makeupCostRepository
+            ->with(['hadSold'])
+            ->findWhere(
+                [
+                    'makeup_id' => $makeup_id,
+                ]
+            );
+        $total = $cost_list->sum(function($cost){ return $cost->count; });
+        $inventory = $cost_list->sum(function($cost){
+            return ($cost->count - $cost->hadSold->sum('relate_count'));
+        });
+        return [
+            'inventory' => $inventory,
+            'total' => $total
+        ];
+    }
+
+    public function getMakeupRealSaleReportByDate(Carbon $start, Carbon $end)
+    {
+        $data = $this->makeupSaleRepository
+            ->with('hadSold', 'hadSold.cost')
+            ->findWhereBetween('sold_date', [$start->startOfMonth()->toDateString(), $end->endOfMonth()->toDateString()])
+            ->map(function($item){
+                $item->cost = $item->hadSold->sum(function($h){
+                    return $h->cost->price;
+                });
+                return $item;
+            })
+            ->groupBy(function ($item) {
+                return substr($item['sold_date'], 0, 7);
+            });
+        $diff_months = $start->diffInMonths($end);
+        $result = [];
+        for ($i=0; $i <= $diff_months; $i++) {
+            $key = '';
+            // start
+            if($i === 0){
+                $key = substr($start->toDateString(), 0, 7);
+            }
+            // end
+            else if($i === $diff_months){
+                $key = substr($end->toDateString(), 0, 7);
+            }else{
+                $key = substr($start->copy()->addMonthNoOverflow($i)->toDateString(), 0, 7);
+            }
+            // 如果沒有資料，設定為0
+            if (isset($data[$key])) {
+                $result[$i] = [
+                    'month' => $key,
+                    'cost' => 0,
+                    'sale' => 0
+                ];
+                foreach ($data[$key] as $record) {
+                    $result[$i]['sale'] += $record->price;
+                    $result[$i]['cost'] += $record->cost;
+                }
+            }else{
+                $result[$i] = [
+                    'month' => $key,
+                    'cost' => 0,
+                    'sale' => 0
+                ];
+            }
+        }
+        return $result;
+    }
+
+    public function getMakeupSaleCountReportByMonth(Carbon $date)
+    {
+        $data = $this->makeupSaleRepository
+            ->with('makeup')
+            ->findWhereBetween('sold_date', [$date->copy()->startOfMonth()->toDateString(), $date->copy()->endOfMonth()->toDateString()])
+            ->groupBy(function ($item) {
+                return $item['makeup']['id'];
+            });
+        $result = [];
+        foreach ($data as $sale) {
+            array_push($result, [
+                'info' => $sale[0]['makeup'],
+                'count' => $sale->sum(function($s){
+                    return $s->count;
+                })
+            ]);
+        }
+        return $result;
+    }
 }

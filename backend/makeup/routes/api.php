@@ -42,6 +42,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'makeup'], function () {
             Route::get('list', 'MakeupController@getMakeup');
             Route::get('', 'MakeupController@getMakeupByQuery');
+            Route::get('{id}/inventory', 'MakeupController@getMakeupInventory');
             Route::post('', 'MakeupController@createMakeupInfo');
             Route::delete('{id}', 'MakeupController@deleteMakeupInfo');
             Route::patch('{id}', 'MakeupController@updateMakeupInfo');
@@ -51,6 +52,8 @@ Route::group(['prefix' => 'v1'], function () {
             Route::post('sale', 'MakeupController@createMakeupSale');
             Route::delete('sale/{id}', 'MakeupController@deleteMakeupSale');
             Route::patch('sale/{id}', 'MakeupController@updateMakeupSale');
+
+            Route::get('reports', 'MakeupController@getReports');
         });
     });
 });

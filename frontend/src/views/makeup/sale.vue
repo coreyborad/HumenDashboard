@@ -109,7 +109,9 @@ export default {
       this.$refs['createSale'].setDefault()
     },
     setUpdateData(data) {
-      this.form = objClone(data)
+      const updateData = objClone(data)
+      updateData.update = true
+      this.form = updateData
     },
     async updateSale() {
       const valid = await this.$refs['form'].validate()

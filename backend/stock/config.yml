@@ -1,0 +1,65 @@
+debug: true
+app_key: 
+server:
+  host: http://go-stock
+  port: 80
+  # https: false
+  # lets_encrypt: false
+  # cert: server.pem
+  # key: server.key
+  # geoip: GeoLite2-Country.mmdb
+# grpc:
+#   port: 9090
+#   account:
+#     host: 127.0.0.1
+#     port: 9090
+# mail:
+#   host: bbbbbbbb
+#   port: 25
+#   from:
+#     address: 4444444
+#     name: 44444
+#   username: 456789
+#   password: 123456
+#   encryption: tls
+# mqtt:
+#   scheme: ssl
+#   broker: emqx
+#   port: 8883
+#   ca: my_root_ca.pem
+#   cert: client.pem
+#   key: client.key
+# redis:
+#   host: redis
+#   port: 6379
+#   prefix: "stock_"
+database:
+  default: mysql
+  mysql:
+    host: mysql
+    port: 3306
+    dbname: dashboard
+    username: default
+    password: secret
+    tls: true
+    charset: utf8mb4
+  pgsql:
+    host: 127.0.0.1
+    port: 5432
+    username: stock
+    dbname: appuser
+    password: secret
+  sqlite:
+    dbname: /tmp/stock.db
+  sqlsrv:
+    host: 127.0.0.1
+    port: 1433
+    username: stock
+    dbname: appuser
+    password: secret
+mongodb:
+  host: mongo
+  port: 27017
+  dbname: database
+swagger:
+  url: https://localhost/swagger/doc.json
