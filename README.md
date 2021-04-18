@@ -8,6 +8,7 @@
 - [vuejs/vue](https://github.com/vuejs/vue) - Frontend framework
 - [PanJiaChen/vue-element-admin](https://github.com/PanJiaChen/vue-element-admin) - Dashboard tempalte
 - [vuejs/vuex](https://github.com/vuejs/vuex) - State management
+- [vuejs/vue-router](https://github.com/vuejs/vue-router) - Route in frontend
 
 ### Backend - Stock
 
@@ -19,6 +20,11 @@
 
 - [php/php-src](https://github.com/php/php-src) - Backend language
 - [laravel/laravel](https://github.com/laravel/laravel) - MVC and ORM framework
+
+### Database
+
+- [mysql]() - Database to save normal record
+- [mongodb]() - Save stock daily record
 
 ## Start
 
