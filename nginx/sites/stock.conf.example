@@ -2,18 +2,8 @@ upstream go-stock  {
    server 172.20.0.3:80;  
 }
 server {
-
-    listen 80 default_server;
-    listen [::]:80 default_server ipv6only=on;
-
-    # For https
-    # listen 443 ssl default_server;
-    # listen [::]:443 ssl default_server ipv6only=on;
-    # ssl_certificate /var/certs/cert1.pem;
-    # ssl_certificate_key /var/certs/privkey1.pem;
-    # ssl_trusted_certificate /var/certs/
-
-    server_name localhost;
+    listen 80;
+    server_name stock.cabbageattic.com;
     root /var/www;
     # index index.php index.html index.htm;
     location / {    
