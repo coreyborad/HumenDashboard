@@ -21,6 +21,7 @@ services:
         - no_proxy
     volumes:
       - ./backend/makeup/:/var/www/makeup:cached
+      - ./wordpress/:/var/www/html:cached
       - ./frontend/dist/:/var/www/static:cached
       - ./logs/nginx/:/var/log/nginx
       - ./nginx/sites/:/etc/nginx/sites-available
@@ -103,3 +104,18 @@ services:
     networks:
       dashboard:
         ipv4_address: 172.20.0.6
+  wordpress:
+    depends_on:
+      - mysql
+    image: wordpress:php7.4-fpm-alpine
+    volumes:
+      - ./wordpress:/var/www/html
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: mysql:3306
+      WORDPRESS_DB_USER: default
+      WORDPRESS_DB_PASSWORD: secret
+    user: "1000:1000"
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.7
