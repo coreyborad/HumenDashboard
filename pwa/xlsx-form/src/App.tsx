@@ -1,15 +1,16 @@
 import React from 'react';
-// import logo from './logo.svg';
 import './App.css';
-import {Form} from './Form/Main'
+import { Form } from './Form/Main'
 
 function App() {
   return (
     <div className="App">
-      <Form/>
+      <Form></Form>
       {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p></p>
+        <p>
+          Edit <code>src/App.tsx</code> and save to reload.
+        </p>
         <a
           className="App-link"
           href="https://reactjs.org"
