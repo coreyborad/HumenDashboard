@@ -1,10 +1,17 @@
 import React from "react";
 import { Box, TextField, Container, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
+import { login } from "../apis/User";
+import { User } from "../interfaces/Interface"
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();  
-    const handleLogin = () => {
+    const [user, setUser] = React.useState<User>({
+        email: "",
+        password: "",
+      });
+    const handleLogin = async () => {
+        await login(user);
         navigate('/form');
     }
 
@@ -30,6 +37,13 @@ export const Login: React.FC = () => {
                     name="email"
                     autoComplete="email"
                     autoFocus
+                    value={user.email}
+                    onChange={(e) =>
+                        setUser({
+                          ...user,
+                          email: e.target.value,
+                        })
+                      }
                 />
                 <TextField
                     margin="normal"
@@ -40,6 +54,13 @@ export const Login: React.FC = () => {
                     type="password"
                     id="password"
                     autoComplete="current-password"
+                    value={user.password}
+                    onChange={(e) =>
+                        setUser({
+                          ...user,
+                          password: e.target.value,
+                        })
+                      }
                 />
                 <Button
                     variant="contained"
