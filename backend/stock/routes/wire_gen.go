@@ -16,8 +16,10 @@ import (
 // InitRoute InitRoute
 func InitRoute() http.Handler {
 	stockController := controllers.CreateStockController()
+	xlsxController := controllers.CreateXlsxController()
 	router := &Router{
 		Stock: stockController,
+		Xlsx:  xlsxController,
 	}
 	handler := Load(router)
 	return handler

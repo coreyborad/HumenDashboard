@@ -1,3 +1,4 @@
+//go:build wireinject
 // +build wireinject
 
 package routes
@@ -17,6 +18,7 @@ var (
 func InitRoute() http.Handler {
 	wire.Build(
 		controllers.CreateStockController,
+		controllers.CreateXlsxController,
 		RouteSet,
 	)
 

@@ -26,9 +26,16 @@ func CreateStockService() *StockService {
 	return stockService
 }
 
+// CreateXlsxService CreateXlsxService
+func CreateXlsxService() *XlsxService {
+	xlsxService := NewXlsxService()
+	return xlsxService
+}
+
 // wire.go:
 
 var (
 	UserServiceSet  = wire.NewSet(NewUserService, repositories.CreateUserRepository)
 	StockServiceSet = wire.NewSet(NewStockService, repositories.CreateStockRepository)
+	XlsxServiceSet  = wire.NewSet(NewXlsxService)
 )

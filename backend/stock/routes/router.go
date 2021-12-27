@@ -17,4 +17,5 @@ type IRouter interface {
 // Router 路由註冊
 type Router struct {
 	Stock *controllers.StockController
+	Xlsx  *controllers.XlsxController
 }
