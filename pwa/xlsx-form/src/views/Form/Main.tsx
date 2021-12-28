@@ -8,6 +8,7 @@ import { Payer } from "./components/Payer";
 import { Category } from "./components/Category";
 import { Note } from "./components/Note"
 import { Cost } from "./components/Cost"
+import { appendRecord } from "../../apis/Xlsx"
 
 export const Form: React.FC = () => {
     const [accountingInfo, setAccountingInfo] = React.useState<Accounting>({
@@ -20,7 +21,8 @@ export const Form: React.FC = () => {
     });
 
     const handleSubmit = async () => {
-        console.log(accountingInfo)
+        await appendRecord(accountingInfo)
+        alert("success")
     }
     return (
         <Container component="main" maxWidth="xs">

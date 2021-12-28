@@ -23,6 +23,7 @@ func (s *XlsxService) AppendRecord(info models.XlsxForm) error {
 	ctx := context.Background()
 	spreadsheetList := map[int]string{}
 	spreadsheetList[2021] = "1MAyVqhbPytK810aSUun2MSKBMz1u3ARgzBJIe11h0rE"
+	spreadsheetList[2022] = "1Itzco7QP0M7V1T0eh_AHfgbHbmcOfnQyMmiEKGEo8SU"
 
 	if spreadsheetList[info.Date.Year()] == "" {
 		return ctx.Err()

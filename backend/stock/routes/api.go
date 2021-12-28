@@ -16,7 +16,7 @@ func (r *Router) RegisterAPI(api *gin.RouterGroup) error {
 				"message": "API v1",
 			})
 		})
-		v1.POST("/xlsx", r.Xlsx.XlsxAppendRecord)
+		
 		authorized := v1.Use(middleware.AuthRequired())
 		{
 			authorized.GET("/testToken", func(ctx *gin.Context) {
@@ -24,6 +24,7 @@ func (r *Router) RegisterAPI(api *gin.RouterGroup) error {
 					"message": "HaveToken",
 				})
 			})
+			authorized.POST("/xlsx", r.Xlsx.XlsxAppendRecord)
 		}
 
 		// v1.POST("/mqtt/acl", r.Certificate.PostACL)
