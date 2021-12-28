@@ -40,7 +40,7 @@ export const Form: React.FC = () => {
                         label="日期"
                         inputFormat="YYYY MM/DD"
                         value={accountingInfo.date}
-                        onChange={(value) =>
+                        onChange={(value: any) =>
                             setAccountingInfo({
                                 ...accountingInfo,
                                 date: value,

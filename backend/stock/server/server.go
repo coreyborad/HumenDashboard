@@ -2,16 +2,15 @@ package server
 
 import (
 	"context"
-	"stock/config"
-	"stock/routes"
-	"stock/websocket"
-
-	// "stock/websocket"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"stock/config"
+	"stock/google"
+	"stock/routes"
+	"stock/websocket"
 	"syscall"
 	"time"
 
@@ -34,6 +33,11 @@ func Init() error {
 
 	// init websocket
 	if err := websocket.Init(); err != nil {
+		return err
+	}
+
+	// init google
+	if err := google.Init(); err != nil {
 		return err
 	}
 
