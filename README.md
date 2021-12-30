@@ -21,13 +21,30 @@
 - [php/php-src](https://github.com/php/php-src) - Backend language
 - [laravel/laravel](https://github.com/laravel/laravel) - MVC and ORM framework
 
+### PWA - Xlsx
+
+- [facebook/react](https://github.com/facebook/react) - Create PWA with React
+- [remix-run/react-router](https://github.com/remix-run/react-router) - This project use `V6` version
+
+Notice: This part's backend is use Stock service, for quick develop
+
 ### Database
 
 - [mysql]() - Database to save normal record
 - [mongodb]() - Save stock daily record
 
+### Other
+
+- [googleapis/google-api-go-client](https://github.com/googleapis/google-api-go-client) - For use google sheet api on Golang
+
 ## Start
 
 ```
 docker-compose up -d --build mysql nginx php-fpm go-stock mongo
+```
+
+## Build
+
+```
+GOOS=linux GOARCH=amd64 go build main.go
 ```
