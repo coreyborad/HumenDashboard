@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"stock/google"
 	"stock/models"
@@ -26,7 +27,7 @@ func (s *XlsxService) AppendRecord(info models.XlsxForm) error {
 	spreadsheetList[2022] = "1Itzco7QP0M7V1T0eh_AHfgbHbmcOfnQyMmiEKGEo8SU"
 
 	if spreadsheetList[info.Date.Year()] == "" {
-		return ctx.Err()
+		return errors.New("Not found years")
 	}
 	spreadsheetId := spreadsheetList[info.Date.Year()]
 	googleServ := google.GetService()
@@ -46,12 +47,11 @@ func (s *XlsxService) AppendRecord(info models.XlsxForm) error {
 		MajorDimension: "ROWS",
 		Values:         val,
 	}
-	valueInputOption := "RAW"
+	valueInputOption := "USER_ENTERED"
 	insertDataOption := "INSERT_ROWS"
-	resp, err := googleServ.Spreadsheets.Values.Append(spreadsheetId, rangeStr, rb).ValueInputOption(valueInputOption).InsertDataOption(insertDataOption).Context(ctx).Do()
+	_, err := googleServ.Spreadsheets.Values.Append(spreadsheetId, rangeStr, rb).ValueInputOption(valueInputOption).InsertDataOption(insertDataOption).Context(ctx).Do()
 	if err != nil {
 		return err
 	}
-	fmt.Println(resp)
 	return nil
 }
