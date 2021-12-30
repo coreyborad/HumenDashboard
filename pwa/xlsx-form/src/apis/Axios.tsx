@@ -1,5 +1,7 @@
 import _axios, { AxiosInstance } from "axios"
-import { getToken }  from "../utils/Token"
+import { getToken, removeToken }  from "../utils/Token"
+import { useNavigate } from 'react-router-dom';
+import histroy from '../History'
 
 const axios:AxiosInstance = _axios.create({
     baseURL: 'https://stock.cabbageattic.com/service',
@@ -26,7 +28,12 @@ axios.interceptors.response.use(
         return response
     },
     error => {
-        console.log('response', error)
+        // If 401 is mean, token invalid
+        if(error.response.status === 401) {
+            // remove token
+            removeToken()
+            histroy.replace("/login");
+        }
         return Promise.reject(error)
     }
 )

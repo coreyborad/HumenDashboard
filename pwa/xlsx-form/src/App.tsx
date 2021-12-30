@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import './App.css';
 import { Login } from './Login/Main'
 import { Form } from './views/Form/Main'
 import Auth from './utils/Auth';
-import { BrowserRouter as Router} from 'react-router-dom'
-import { useRoutes } from "react-router-dom";
+import { useRoutes, Router } from "react-router-dom";
+import customHistory from "./History"
 
 
 const App = () => {
@@ -27,29 +27,29 @@ const App = () => {
   return element;
 }
 
-// function App() {
-//   return (
-//     <div>
-//       <Router>
-//           <Routes>
-//             <Route path="/login" element={<Login/>}></Route>
-//             <Route path="/" element={<Login/>}>
-//               <Route element={<Auth/>}>
-//                 <Route path="form" element={<Form/>}/>
-//               </Route>
-//             </Route>
-//           </Routes>
-//       </Router>
-//     </div>
+const CustomRouter = ({ history, ...props }:{ children: any; history: any; }) => {
+  const [state, setState] = useState({
+    action: history.action,
+    location: history.location
+  });
 
-//   );
-// }
+  useLayoutEffect(() => history.listen(setState), [history]);
+
+  return (
+    <Router
+      {...props}
+      location={state.location}
+      navigationType={state.action}
+      navigator={history}
+    />
+  );
+};
 
 const AppWrapper = () => {
   return (
-    <Router>
+    <CustomRouter history={customHistory}>
       <App />
-    </Router>
+    </CustomRouter>
   );
 };
 
