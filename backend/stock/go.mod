@@ -18,7 +18,6 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/go-redis/redis/v8 v8.6.0
 	github.com/go-redsync/redsync/v4 v4.0.4
-	github.com/golang/protobuf v1.4.2
 	github.com/google/uuid v1.1.2
 	github.com/google/wire v0.5.0
 	github.com/gorilla/websocket v1.4.2
@@ -42,11 +41,14 @@ require (
 	github.com/xdg/stringprep v0.0.0-20180714160509-73f8eece6fdc // indirect
 	go.mongodb.org/mongo-driver v1.5.1
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
-	google.golang.org/genproto v0.0.0-20201009135657-4d944d34d83c // indirect
-	google.golang.org/grpc v1.33.0
-	google.golang.org/protobuf v1.25.0
+	golang.org/x/tools v0.1.8 // indirect
+	google.golang.org/api v0.63.0
+	google.golang.org/grpc v1.40.1
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v2 v2.3.0

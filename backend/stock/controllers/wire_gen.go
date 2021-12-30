@@ -19,8 +19,16 @@ func CreateStockController() *StockController {
 	return stockController
 }
 
+// CreateXlsxController CreateXlsxController
+func CreateXlsxController() *XlsxController {
+	xlsxService := services.CreateXlsxService()
+	xlsxController := NewXlsxController(xlsxService)
+	return xlsxController
+}
+
 // wire.go:
 
 var (
 	StockControllerSet = wire.NewSet(NewStockController, services.CreateStockService)
+	XlsxControllerSet  = wire.NewSet(NewXlsxController, services.CreateXlsxService)
 )
