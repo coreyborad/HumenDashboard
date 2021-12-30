@@ -7,9 +7,7 @@ import (
 
 func InternalCORS() gin.HandlerFunc {
 	config := cors.DefaultConfig()
-	config.AllowOriginFunc = func(origin string) bool {
-		return origin == "https://*.cabbageattic.com"
-	}
+	config.AllowAllOrigins = true
 	config.AllowCredentials = true
 	config.AddAllowHeaders("Authorization")
 

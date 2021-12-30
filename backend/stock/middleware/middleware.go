@@ -13,7 +13,7 @@ func RouteMiddleware(e *gin.Engine) *gin.Engine {
 	e.Use(
 		gin.Recovery(),
 		RateLimit(), //流量限制
-		InternalCORS(),
+		// InternalCORS(),
 
 		gzip.Gzip(gzip.DefaultCompression),
 	)
