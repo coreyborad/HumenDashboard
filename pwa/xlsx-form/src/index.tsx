@@ -6,6 +6,7 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
+import { GlobalLoader } from './apis/Axios';
 
 const theme = createTheme({
   palette: {
@@ -15,7 +16,9 @@ const theme = createTheme({
 
 
 ReactDOM.render(
+  
   <React.StrictMode>
+    <GlobalLoader />
     <ThemeProvider theme={theme}>
       <CssBaseline></CssBaseline>
       <App />

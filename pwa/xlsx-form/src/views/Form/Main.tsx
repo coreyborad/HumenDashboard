@@ -1,6 +1,6 @@
 import React from "react";
 import { Accounting } from "../../interfaces/Interface";
-import { Box, TextField, Container, Button, TextFieldProps } from '@mui/material';
+import { Box, TextField, Container, Button, TextFieldProps, Snackbar, Alert } from '@mui/material';
 import { MobileDatePicker } from '@mui/lab';
 import AdapterDayjs from '@mui/lab/AdapterDayjs';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -20,9 +20,11 @@ export const Form: React.FC = () => {
         cost: 0
     });
 
+    const [showSuccess, setShowSuccess] = React.useState(false);
+
     const handleSubmit = async () => {
         await appendRecord(accountingInfo)
-        alert("success")
+        setShowSuccess(true)
     }
     return (
         <Container component="main" maxWidth="xs">
@@ -112,6 +114,19 @@ export const Form: React.FC = () => {
                     Submit
                 </Button>
             </Box>
+            <Snackbar 
+                open={showSuccess} 
+                autoHideDuration={3000}
+                anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                }}
+                onClose={()=>{setShowSuccess(false)}}
+            >
+                <Alert severity="success" sx={{ width: '100%' }}>
+                    Append success
+                </Alert>
+            </Snackbar>
         </Container>
     )
 }

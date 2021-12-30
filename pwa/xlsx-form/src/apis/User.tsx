@@ -1,4 +1,4 @@
-import axios from "./Axios";
+import {axios} from "./Axios";
 import { User } from "../interfaces/Interface"
 import { setToken }  from "../utils/Token"
 
