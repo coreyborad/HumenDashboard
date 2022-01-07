@@ -76,10 +76,14 @@ func (r *StockRepository) GetStockDataByDate(stockNumber string, start_date *tim
 	return stock_list, nil
 }
 
-func (r *StockRepository) GetLastStockData(stockNumber string, last *int64) ([]*models.StockData, error) {
+func (r *StockRepository) GetLastStockData(stockNumber string, last *int64, beforeThisDate *time.Time) ([]*models.StockData, error) {
 	ctx := context.Background()
+	fmt.Println(beforeThisDate.UTC())
 	filter := bson.M{
 		"stock_number": stockNumber,
+		"deal_date": bson.M{
+			"$lte": beforeThisDate.UTC(),
+		},
 	}
 
 	cursor, err := r.mongodb.Find(ctx, filter, &options.FindOptions{
@@ -96,6 +100,7 @@ func (r *StockRepository) GetLastStockData(stockNumber string, last *int64) ([]*
 	if err = cursor.All(ctx, &stock_list); err != nil {
 		return nil, err
 	}
+	// Desc order
 	return stock_list, nil
 }
 
@@ -160,6 +165,36 @@ func (r *StockRepository) InsertToMongo(stock *models.StockData) error {
 		return err
 	}
 	return nil
+}
+
+func (r *StockRepository) CalcKDVal(stockList []*models.StockData, last *int64) ([]*models.StockKD, error) {
+	lastKDList := []*models.StockKD{}
+	periodHighest := stockList[len(stockList)-1].PriceOnHighest
+	periodLowest := stockList[len(stockList)-1].PriceOnLowest
+	lastKVal := float64(50)
+	lastDVal := float64(50)
+	for i := len(stockList) - 1; i >= 0; i-- {
+		if stockList[i].PriceOnHighest > periodHighest {
+			periodHighest = stockList[i].PriceOnHighest
+		}
+		if stockList[i].PriceOnLowest < periodLowest {
+			periodLowest = stockList[i].PriceOnLowest
+		}
+		closePrice := stockList[i].PriceOnClose
+
+		rsv := (closePrice - periodLowest) / (periodHighest - periodLowest) * 100
+		lastKVal = (0.67 * lastKVal) + (0.33 * rsv)
+		lastDVal = (0.67 * lastDVal) + (0.33 * lastKVal)
+
+		// Asc order
+		if int64(i) < *last {
+			lastKDList = append(lastKDList, &models.StockKD{
+				KVal: lastKVal,
+				DVal: lastDVal,
+			})
+		}
+	}
+	return lastKDList, nil
 }
 
 func (r *StockRepository) Test() {

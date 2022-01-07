@@ -21,6 +21,18 @@ func Manually() *cli.Command {
 		},
 		Subcommands: []*cli.Command{
 			{
+				Name:  "parser_stock",
+				Usage: "Run the manually commands",
+				Action: func(c *cli.Context) error {
+					if err := bootstrap(c); err != nil {
+						return err
+					}
+					stockServ := services.CreateStockService()
+					stockServ.DailyParser()
+					return nil
+				},
+			},
+			{
 				Name:  "stock",
 				Usage: "Run the manually commands",
 				Action: func(c *cli.Context) error {
@@ -28,7 +40,9 @@ func Manually() *cli.Command {
 						return err
 					}
 					stockServ := services.CreateStockService()
-					stockServ.ParserDataOnManual()
+					// date := time.Date(2021, time.September, 9, 0, 0, 0, 0, time.UTC)
+					// stockServ.Calc([]string{"2330"}, &date)
+					stockServ.Calc([]string{"2330"}, nil)
 					return nil
 				},
 			},

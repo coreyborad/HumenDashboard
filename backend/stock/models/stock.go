@@ -32,3 +32,8 @@ type StockData struct {
 	CreatedAt      *time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt      *time.Time `json:"updated_at" bson:"updated_at"`
 }
+
+type StockKD struct {
+	KVal float64
+	DVal float64
+}
