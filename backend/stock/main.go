@@ -17,6 +17,8 @@ func main() {
 	app.EnableBashCompletion = true
 	app.Commands = []*cli.Command{
 		cmd.Start(),
+		cmd.Schedule(),
+		cmd.Manually(),
 		// cmd.Migrate(),
 		// cmd.Seed(),
 		// cmd.Mqtt(),

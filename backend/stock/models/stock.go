@@ -17,6 +17,10 @@ type Stock struct {
 	UpdatedAt   *time.Time `json:"updated_at"`
 }
 
+func (s Stock) TableName() string {
+	return "stock_info"
+}
+
 type StockData struct {
 	StockNumber    string     `json:"stock_number" bson:"stock_number"`
 	DealDate       *time.Time `json:"deal_date" bson:"deal_date"`
