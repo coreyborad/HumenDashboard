@@ -12,7 +12,7 @@ import (
 func HtmlToImage(html string) (string, error) {
 	fileName := uuid.New().String()
 	filePath := fmt.Sprintf("/tmp/%s.png", fileName)
-	cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("echo '%s' | wkhtmltoimage - - %s", html, filePath))
+	cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("echo '%s' | xvfb-run wkhtmltoimage - - %s", html, filePath))
 	_, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Println(err)

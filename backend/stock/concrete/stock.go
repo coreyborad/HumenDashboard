@@ -98,6 +98,7 @@ func (c *StockConcrete) DailyCalc() error {
 	}
 	m := sync.Map{}
 	wg := sync.WaitGroup{}
+	fmt.Println("Start calc")
 	for _, stockNumber := range stockList {
 		wg.Add(1)
 		go func(stockNumber string) {
@@ -145,9 +146,10 @@ func (c *StockConcrete) DailyCalc() error {
 	// Generate photo
 	imgPath, err := utils.HtmlToImage(html)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
-
+	fmt.Println(imgPath)
 	// TG bot
 	bot, err := tgbotapi.NewBotAPI(config.Telegram.Token)
 	if err != nil {
@@ -165,7 +167,6 @@ func (c *StockConcrete) DailyCalc() error {
 		fmt.Println("error:", err)
 		return err
 	}
-
 	// Delete file
 	utils.HtmlToImageDelete(imgPath)
 	return nil
