@@ -17,6 +17,10 @@ type Stock struct {
 	UpdatedAt   *time.Time `json:"updated_at"`
 }
 
+func (s Stock) TableName() string {
+	return "stock_info"
+}
+
 type StockData struct {
 	StockNumber    string     `json:"stock_number" bson:"stock_number"`
 	DealDate       *time.Time `json:"deal_date" bson:"deal_date"`
@@ -27,4 +31,19 @@ type StockData struct {
 	PriceOnClose   float64    `json:"price_on_close" bson:"price_on_close"`
 	CreatedAt      *time.Time `json:"created_at" bson:"created_at"`
 	UpdatedAt      *time.Time `json:"updated_at" bson:"updated_at"`
+}
+
+type StockKD struct {
+	KVal       float64
+	DVal       float64
+	Uppercross bool
+	Undercross bool
+	HighLag    bool
+	LowLag     bool
+}
+
+type StockTechVal struct {
+	PriceOnClose float64
+	KDVal        StockKD
+	Action       string
 }

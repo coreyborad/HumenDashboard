@@ -62,10 +62,10 @@ class GetStock extends Command
                         'stock_name' => $stock[1]
                     ]);
                 }
-
+                $deal_date = Carbon::parse($response['date'])->setTimezone('Asia/Taipei');
                 $this->mongoStockHistoryRepository->create([
                     'stock_number' => $stock[0],
-                    'deal_date' => Carbon::parse($response['date']),
+                    'deal_date' => $deal_date,
                     'deal_count' => intval(str_replace(',', '', $stock[2])),
                     'price_on_open' => floatval(str_replace(',', '', $stock[4])),
                     'price_on_highest' => floatval(str_replace(',', '', $stock[5])),

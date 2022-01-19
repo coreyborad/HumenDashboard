@@ -61,9 +61,27 @@ services:
     environment:
       - TZ=Asia/Taipei
     command: ./server.run start
+    depends_on:
+      - mysql
+      - mongo
     networks:
       dashboard:
         ipv4_address: 172.20.0.3
+  go-stock-schedule:
+    restart: always
+    build:
+      context: ./go
+    volumes:
+      - ./backend/stock/:/go/src/stock:cached
+    environment:
+      - TZ=Asia/Taipei
+    command: ./server.run schedule run
+    depends_on:
+      - mysql
+      - mongo
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.8
   php-fpm:
     build:
       context: ./php-fpm

@@ -9,6 +9,20 @@ RUN set -x \
   && apt-get install -y --no-install-recommends \
   git unzip
 
+# Set locale
+RUN apt-get update -y
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=en_US.UTF-8
+
+ENV LANG en_US.UTF-8
+
+RUN apt-get install -y fonts-wqy-microhei ttf-wqy-microhei fonts-wqy-zenhei ttf-wqy-zenhei
+
+RUN fc-cache -f -v
+
 # Set Timezone
 ARG TZ=UTC
 ENV TZ ${TZ}
@@ -36,6 +50,10 @@ RUN go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 RUN curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip -o /tmp/protoc.zip && \
   unzip -o /tmp/protoc.zip -d /usr/local bin/protoc && \
   unzip -o /tmp/protoc.zip -d /usr/local include/*
+
+# wkhtml
+RUN apt-get update -y
+RUN apt-get install -y wkhtmltopdf xvfb xauth xfonts-base xfonts-75dpi fontconfig
 
 # Clean up
 RUN apt-get clean \

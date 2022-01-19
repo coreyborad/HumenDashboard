@@ -61,5 +61,9 @@ mongodb:
   host: mongo
   port: 27017
   dbname: database
+telegram:
+  token: abcdefghti
+  chats:
+    - 12312313
 swagger:
   url: https://localhost/swagger/doc.json

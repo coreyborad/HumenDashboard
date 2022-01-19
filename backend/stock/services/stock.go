@@ -4,9 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"stock/models"
 	"stock/repositories"
 	"stock/websocket"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 )
 
 // StockService Stock Service
@@ -66,4 +72,235 @@ func (s *StockService) ReadWs(ctx context.Context, client *websocket.Client) {
 			}
 		}
 	}
+}
+
+func (s *StockService) DailyParser() error {
+	// Get data
+	url := "https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL?response=json"
+	client := &http.Client{}
+	resp, err := client.Get(url)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	defer resp.Body.Close()
+	type RawPayload struct {
+		Data [][]string `json:"data"`
+		Date string     `json:"date"`
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rawpayload := &RawPayload{}
+	json.Unmarshal(body, rawpayload)
+	// Format Data with go routine
+	dealDateFormat, err := time.Parse("20060102", rawpayload.Date)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	dealDate := time.Date(dealDateFormat.Year(), dealDateFormat.Month(), dealDateFormat.Day(), 8, 0, 0, 0, time.Now().Location())
+	replaceTenPercentile := func(target string) string {
+		return strings.ReplaceAll(target, ",", "")
+	}
+	wg := sync.WaitGroup{}
+	for _, stock := range rawpayload.Data {
+		now := time.Now()
+		stockName := stock[1]
+		dealCount, _ := strconv.ParseInt(replaceTenPercentile(stock[2]), 10, 64)
+		priceOnOpen, _ := strconv.ParseFloat(replaceTenPercentile(stock[4]), 64)
+		priceOnHighest, _ := strconv.ParseFloat(replaceTenPercentile(stock[5]), 64)
+		priceOnLowest, _ := strconv.ParseFloat(replaceTenPercentile(stock[6]), 64)
+		priceOnClose, _ := strconv.ParseFloat(replaceTenPercentile(stock[7]), 64)
+		stockData := &models.StockData{
+			StockNumber:    stock[0],
+			DealDate:       &dealDate,
+			DealCount:      uint64(dealCount),
+			PriceOnOpen:    priceOnOpen,
+			PriceOnHighest: priceOnHighest,
+			PriceOnLowest:  priceOnLowest,
+			PriceOnClose:   priceOnClose,
+			CreatedAt:      &now,
+			UpdatedAt:      &now,
+		}
+		_, err := s.stockRep.Find(stockData.StockNumber)
+		if err != nil {
+			fmt.Println("empty")
+			stockModel := &models.Stock{}
+			stockModel.StockNumber = stockData.StockNumber
+			stockModel.StockName = stockName
+			stockModel.CreatedAt = stockData.CreatedAt
+			stockModel.UpdatedAt = stockData.UpdatedAt
+			s.stockRep.Create(stockModel)
+		}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			err = s.stockRep.InsertToMongo(stockData)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}()
+	}
+	wg.Wait()
+	return nil
+}
+
+func (s *StockService) Calc(stockNumber string, date *time.Time) (models.StockTechVal, error) {
+	if stockNumber == "" {
+		stockNumber = "0050"
+	}
+	if date == nil {
+		now := time.Now()
+		date = &now
+	}
+	lastDays := int64(60)
+	// Desc order
+	stockList, err := s.stockRep.GetLastStockData(stockNumber, &lastDays, date)
+	if err != nil {
+		fmt.Println(err)
+		return models.StockTechVal{}, err
+	}
+	if len(stockList) <= 0 {
+		fmt.Println("Empty skip calc")
+		return models.StockTechVal{}, nil
+	}
+
+	// ----Calc KD----
+	lastKD := int64(9)
+	if int64(len(stockList)) < lastKD {
+		// fmt.Println("Not enough data")
+		return models.StockTechVal{}, nil
+	}
+	// 策略
+	// 1. 碰到Uppercross = true 隔日做多
+
+	// ASC order
+	lastKDList, err := s.stockRep.CalcKDVal(stockList[:lastKD], &lastKD)
+	if err != nil {
+		fmt.Println(err)
+		return models.StockTechVal{}, err
+	}
+	// for _, v := range lastKDList {
+	// 	fmt.Println(v.KVal, v.DVal)
+	// }
+	// 0. 標示出最後一筆K跟D
+	// 1. KD上漲交叉
+	// Condtion(n=9)
+	// 012345678
+	// [2:7] => 23456
+	// A: 最後1筆KD要小於80
+	// B: 第2~第6筆,要都是D>K
+	// C: 最後2筆KD值,要都是K>D
+	checkUppercrossFunc := func() bool {
+		if lastKDList[int(lastKD)-1].KVal > 80 || lastKDList[int(lastKD)-1].DVal > 80 {
+			return false
+		}
+		for _, kdVal := range lastKDList[2 : (int(lastKD))-2] {
+			if kdVal.DVal < kdVal.KVal {
+				return false
+			}
+		}
+		for _, kdVal := range lastKDList[(int(lastKD))-2:] {
+			if kdVal.KVal < kdVal.DVal {
+				return false
+			}
+		}
+		return true
+	}
+	isUppercross := checkUppercrossFunc()
+	// 2. KD下跌交叉
+	// Condtion(n=9)
+	// A: 最後1筆KD要大於20
+	// B: 第2~第6筆,要都是D<K
+	// C: 最後2筆KD值,要都是K<D
+	checkUndercrossFunc := func() bool {
+		if lastKDList[int(lastKD)-1].KVal < 20 || lastKDList[int(lastKD)-1].DVal < 20 {
+			return false
+		}
+		for _, kdVal := range lastKDList[2 : (int(lastKD))-2] {
+			if kdVal.DVal > kdVal.KVal {
+				return false
+			}
+		}
+		for _, kdVal := range lastKDList[(int(lastKD))-2:] {
+			if kdVal.KVal > kdVal.DVal {
+				return false
+			}
+		}
+		return true
+	}
+	isUndercross := checkUndercrossFunc()
+	// 3. KD高檔鈍化
+	// Condtion(n=9)
+	// A: 最後3筆K>80
+	// B: 最後1筆收盤價>最後第2,3筆的收盤價
+	// C: 最後1筆K > D
+	checkHighLag := func() bool {
+		for _, kdVal := range lastKDList[(int(lastKD))-3:] {
+			if kdVal.KVal < 80 {
+				return false
+			}
+		}
+		lastClosePrice := stockList[0].PriceOnClose
+		if lastClosePrice < stockList[1].PriceOnClose || lastClosePrice < stockList[2].PriceOnClose {
+			return false
+		}
+		if lastKDList[int(lastKD)-1].KVal < lastKDList[int(lastKD)-1].DVal {
+			return false
+		}
+		return true
+	}
+	isHighLag := checkHighLag()
+	// 4. KD低檔鈍化
+	// Condtion(n=9)
+	// A: 最後3筆K<20
+	// B: 最後1筆收盤價<最後第2,3筆的收盤價
+	// C: 最後1筆K < D
+	checkLowLag := func() bool {
+		for _, kdVal := range lastKDList[(int(lastKD))-3:] {
+			if kdVal.KVal > 20 {
+				return false
+			}
+		}
+		lastClosePrice := stockList[0].PriceOnClose
+		if lastClosePrice > stockList[1].PriceOnClose || lastClosePrice > stockList[2].PriceOnClose {
+			return false
+		}
+		if lastKDList[int(lastKD)-1].KVal > lastKDList[int(lastKD)-1].DVal {
+			return false
+		}
+		return true
+	}
+	isLowLag := checkLowLag()
+
+	stockTechVal := models.StockTechVal{
+		PriceOnClose: stockList[len(stockList)-1].PriceOnClose,
+		KDVal: models.StockKD{
+			KVal:       lastKDList[int(lastKD)-1].KVal,
+			DVal:       lastKDList[int(lastKD)-1].DVal,
+			Uppercross: isUppercross,
+			Undercross: isUndercross,
+			HighLag:    isHighLag,
+			LowLag:     isLowLag,
+		},
+		Action: "hold",
+	}
+	// action
+	if isUppercross {
+		stockTechVal.Action = "buy"
+	} else if isUndercross {
+		stockTechVal.Action = "sell"
+	}
+
+	return stockTechVal, nil
+}
+
+func (s *StockService) ParserDataOnManual() error {
+	now := time.Now()
+	s.stockRep.ParserStockDataByMonth("0050", &now)
+	return nil
 }
