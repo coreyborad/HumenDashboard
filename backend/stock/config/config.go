@@ -26,6 +26,7 @@ type (
 		// Redis      redis    `yaml:"redis"`
 		Database database `yaml:"database"`
 		MongoDB  mongodb  `yaml:"mongodb"`
+		Telegram telegram `yaml:"telegram"`
 		// Swagger    swagger  `yaml:"swagger"`
 	}
 	server struct {
@@ -100,6 +101,10 @@ type (
 		Port   string `yaml:"port"`
 		DbName string `yaml:"dbname"`
 	}
+	telegram struct {
+		Token string   `yaml:"token"`
+		Chats []string `yaml:"chats"`
+	}
 	// swagger struct {
 	// 	URL string `yaml:"url"`
 	// }
@@ -119,6 +124,7 @@ var (
 	Server   = &server{}
 	Database = &database{}
 	MongoDB  = &mongodb{}
+	Telegram = &telegram{}
 	// GRPC     = &grpc{}
 	// Mail     = &mail{}
 	// MQTT     = &mqtt{}
@@ -156,6 +162,7 @@ func Load(path string) (err error) {
 	Database = &App.Database
 	MongoDB = &App.MongoDB
 	// Swagger = &App.Swagger
+	Telegram = &App.Telegram
 
 	App.Load = true
 

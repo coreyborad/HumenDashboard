@@ -149,147 +149,154 @@ func (s *StockService) DailyParser() error {
 	return nil
 }
 
-func (s *StockService) Calc(stockNumberList []string, date *time.Time) (interface{}, error) {
-	if stockNumberList == nil || len(stockNumberList) <= 0 {
-		stockNumberList = []string{
-			"0050",
-			"2330",
-			"00733",
-			"2412",
-		}
+func (s *StockService) Calc(stockNumber string, date *time.Time) (models.StockTechVal, error) {
+	if stockNumber == "" {
+		stockNumber = "0050"
 	}
 	if date == nil {
 		now := time.Now()
 		date = &now
 	}
-	for _, stockNumber := range stockNumberList {
-		fmt.Println("====Start====")
-		fmt.Printf("%s => %s  \n", date.String(), stockNumber)
-		lastDays := int64(60)
-		// Desc order
-		stockList, err := s.stockRep.GetLastStockData("0050", &lastDays, date)
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-		if len(stockList) <= 0 {
-			fmt.Println("Empty skip calc")
-			return nil, nil
-		}
-
-		// ----Calc KD----
-		// 策略
-		// 1. 碰到Uppercross = true 隔日做多
-		// 直到K跟D都超過80就賣出
-		// 2. 碰到High Lag = true 隔日做多
-		// 2天後賣出
-		lastKD := int64(9)
-		// ASC order
-		lastKDList, err := s.stockRep.CalcKDVal(stockList[:lastKD], &lastKD)
-		if err != nil {
-			fmt.Println(err)
-			return nil, err
-		}
-		// for _, v := range lastKDList {
-		// 	fmt.Println(v.KVal, v.DVal)
-		// }
-		// 0. 標示出最後一筆K跟D
-		fmt.Printf("K: %f, D: %f \n", lastKDList[int(lastKD)-1].KVal, lastKDList[int(lastKD)-1].DVal)
-		// 1. KD上漲交叉
-		// Condtion(n=9)
-		// 012345678
-		// [2:7] => 23456
-		// A: 最後1筆KD要小於80
-		// B: 第2~第6筆,要都是D>K
-		// C: 最後2筆KD值,要都是K>D
-		checkUppercrossFunc := func() bool {
-			if lastKDList[int(lastKD)-1].KVal > 80 || lastKDList[int(lastKD)-1].DVal > 80 {
-				return false
-			}
-			for _, kdVal := range lastKDList[2 : (int(lastKD))-2] {
-				if kdVal.DVal < kdVal.KVal {
-					return false
-				}
-			}
-			for _, kdVal := range lastKDList[(int(lastKD))-2:] {
-				if kdVal.KVal < kdVal.DVal {
-					return false
-				}
-			}
-			return true
-		}
-		isUppercross := checkUppercrossFunc()
-		fmt.Printf("Uppercross: %t \n", isUppercross)
-		// 2. KD下跌交叉
-		// Condtion(n=9)
-		// A: 最後1筆KD要大於20
-		// B: 第2~第6筆,要都是D<K
-		// C: 最後2筆KD值,要都是K<D
-		checkUndercrossFunc := func() bool {
-			if lastKDList[int(lastKD)-1].KVal < 20 || lastKDList[int(lastKD)-1].DVal < 20 {
-				return false
-			}
-			for _, kdVal := range lastKDList[2 : (int(lastKD))-2] {
-				if kdVal.DVal > kdVal.KVal {
-					return false
-				}
-			}
-			for _, kdVal := range lastKDList[(int(lastKD))-2:] {
-				if kdVal.KVal > kdVal.DVal {
-					return false
-				}
-			}
-			return true
-		}
-		isUndercross := checkUndercrossFunc()
-		fmt.Printf("Undercross: %t \n", isUndercross)
-		// 3. KD高檔鈍化
-		// Condtion(n=9)
-		// A: 最後3筆K>80
-		// B: 最後1筆收盤價>最後第2,3筆的收盤價
-		// C: 最後1筆K > D
-		checkHighLag := func() bool {
-			for _, kdVal := range lastKDList[(int(lastKD))-3:] {
-				if kdVal.KVal < 80 {
-					return false
-				}
-			}
-			lastClosePrice := stockList[0].PriceOnClose
-			if lastClosePrice < stockList[1].PriceOnClose || lastClosePrice < stockList[2].PriceOnClose {
-				return false
-			}
-			if lastKDList[int(lastKD)-1].KVal < lastKDList[int(lastKD)-1].DVal {
-				return false
-			}
-			return true
-		}
-		isHighLag := checkHighLag()
-		fmt.Printf("High Lag: %t \n", isHighLag)
-		// 4. KD低檔鈍化
-		// Condtion(n=9)
-		// A: 最後3筆K<20
-		// B: 最後1筆收盤價<最後第2,3筆的收盤價
-		// C: 最後1筆K < D
-		checkLowLag := func() bool {
-			for _, kdVal := range lastKDList[(int(lastKD))-3:] {
-				if kdVal.KVal > 20 {
-					return false
-				}
-			}
-			lastClosePrice := stockList[0].PriceOnClose
-			if lastClosePrice > stockList[1].PriceOnClose || lastClosePrice > stockList[2].PriceOnClose {
-				return false
-			}
-			if lastKDList[int(lastKD)-1].KVal > lastKDList[int(lastKD)-1].DVal {
-				return false
-			}
-			return true
-		}
-		isLowLag := checkLowLag()
-		fmt.Printf("Low Lag: %t \n", isLowLag)
+	lastDays := int64(60)
+	// Desc order
+	stockList, err := s.stockRep.GetLastStockData(stockNumber, &lastDays, date)
+	if err != nil {
+		fmt.Println(err)
+		return models.StockTechVal{}, err
+	}
+	if len(stockList) <= 0 {
+		fmt.Println("Empty skip calc")
+		return models.StockTechVal{}, nil
 	}
 
-	return nil, nil
+	// ----Calc KD----
+	lastKD := int64(9)
+	if int64(len(stockList)) < lastKD {
+		// fmt.Println("Not enough data")
+		return models.StockTechVal{}, nil
+	}
+	// 策略
+	// 1. 碰到Uppercross = true 隔日做多
+
+	// ASC order
+	lastKDList, err := s.stockRep.CalcKDVal(stockList[:lastKD], &lastKD)
+	if err != nil {
+		fmt.Println(err)
+		return models.StockTechVal{}, err
+	}
+	// for _, v := range lastKDList {
+	// 	fmt.Println(v.KVal, v.DVal)
+	// }
+	// 0. 標示出最後一筆K跟D
+	// 1. KD上漲交叉
+	// Condtion(n=9)
+	// 012345678
+	// [2:7] => 23456
+	// A: 最後1筆KD要小於80
+	// B: 第2~第6筆,要都是D>K
+	// C: 最後2筆KD值,要都是K>D
+	checkUppercrossFunc := func() bool {
+		if lastKDList[int(lastKD)-1].KVal > 80 || lastKDList[int(lastKD)-1].DVal > 80 {
+			return false
+		}
+		for _, kdVal := range lastKDList[2 : (int(lastKD))-2] {
+			if kdVal.DVal < kdVal.KVal {
+				return false
+			}
+		}
+		for _, kdVal := range lastKDList[(int(lastKD))-2:] {
+			if kdVal.KVal < kdVal.DVal {
+				return false
+			}
+		}
+		return true
+	}
+	isUppercross := checkUppercrossFunc()
+	// 2. KD下跌交叉
+	// Condtion(n=9)
+	// A: 最後1筆KD要大於20
+	// B: 第2~第6筆,要都是D<K
+	// C: 最後2筆KD值,要都是K<D
+	checkUndercrossFunc := func() bool {
+		if lastKDList[int(lastKD)-1].KVal < 20 || lastKDList[int(lastKD)-1].DVal < 20 {
+			return false
+		}
+		for _, kdVal := range lastKDList[2 : (int(lastKD))-2] {
+			if kdVal.DVal > kdVal.KVal {
+				return false
+			}
+		}
+		for _, kdVal := range lastKDList[(int(lastKD))-2:] {
+			if kdVal.KVal > kdVal.DVal {
+				return false
+			}
+		}
+		return true
+	}
+	isUndercross := checkUndercrossFunc()
+	// 3. KD高檔鈍化
+	// Condtion(n=9)
+	// A: 最後3筆K>80
+	// B: 最後1筆收盤價>最後第2,3筆的收盤價
+	// C: 最後1筆K > D
+	checkHighLag := func() bool {
+		for _, kdVal := range lastKDList[(int(lastKD))-3:] {
+			if kdVal.KVal < 80 {
+				return false
+			}
+		}
+		lastClosePrice := stockList[0].PriceOnClose
+		if lastClosePrice < stockList[1].PriceOnClose || lastClosePrice < stockList[2].PriceOnClose {
+			return false
+		}
+		if lastKDList[int(lastKD)-1].KVal < lastKDList[int(lastKD)-1].DVal {
+			return false
+		}
+		return true
+	}
+	isHighLag := checkHighLag()
+	// 4. KD低檔鈍化
+	// Condtion(n=9)
+	// A: 最後3筆K<20
+	// B: 最後1筆收盤價<最後第2,3筆的收盤價
+	// C: 最後1筆K < D
+	checkLowLag := func() bool {
+		for _, kdVal := range lastKDList[(int(lastKD))-3:] {
+			if kdVal.KVal > 20 {
+				return false
+			}
+		}
+		lastClosePrice := stockList[0].PriceOnClose
+		if lastClosePrice > stockList[1].PriceOnClose || lastClosePrice > stockList[2].PriceOnClose {
+			return false
+		}
+		if lastKDList[int(lastKD)-1].KVal > lastKDList[int(lastKD)-1].DVal {
+			return false
+		}
+		return true
+	}
+	isLowLag := checkLowLag()
+
+	stockTechVal := models.StockTechVal{
+		PriceOnClose: stockList[len(stockList)-1].PriceOnClose,
+		KDVal: models.StockKD{
+			KVal:       lastKDList[int(lastKD)-1].KVal,
+			DVal:       lastKDList[int(lastKD)-1].DVal,
+			Uppercross: isUppercross,
+			Undercross: isUndercross,
+			HighLag:    isHighLag,
+			LowLag:     isLowLag,
+		},
+		Action: "hold",
+	}
+	// action
+	if isUppercross {
+		stockTechVal.Action = "buy"
+	} else if isUndercross {
+		stockTechVal.Action = "sell"
+	}
+
+	return stockTechVal, nil
 }
 
 func (s *StockService) ParserDataOnManual() error {

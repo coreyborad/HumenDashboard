@@ -34,6 +34,16 @@ type StockData struct {
 }
 
 type StockKD struct {
-	KVal float64
-	DVal float64
+	KVal       float64
+	DVal       float64
+	Uppercross bool
+	Undercross bool
+	HighLag    bool
+	LowLag     bool
+}
+
+type StockTechVal struct {
+	PriceOnClose float64
+	KDVal        StockKD
+	Action       string
 }

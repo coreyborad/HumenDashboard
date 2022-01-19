@@ -18,6 +18,7 @@ require (
 	github.com/go-playground/validator/v10 v10.3.0 // indirect
 	github.com/go-redis/redis/v8 v8.6.0
 	github.com/go-redsync/redsync/v4 v4.0.4
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/google/uuid v1.1.2
 	github.com/google/wire v0.5.0
 	github.com/gorilla/websocket v1.4.2

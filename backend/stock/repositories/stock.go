@@ -78,7 +78,6 @@ func (r *StockRepository) GetStockDataByDate(stockNumber string, start_date *tim
 
 func (r *StockRepository) GetLastStockData(stockNumber string, last *int64, beforeThisDate *time.Time) ([]*models.StockData, error) {
 	ctx := context.Background()
-	fmt.Println(beforeThisDate.UTC())
 	filter := bson.M{
 		"stock_number": stockNumber,
 		"deal_date": bson.M{

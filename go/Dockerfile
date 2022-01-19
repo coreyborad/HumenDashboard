@@ -37,6 +37,10 @@ RUN curl -L https://github.com/protocolbuffers/protobuf/releases/download/v3.12.
   unzip -o /tmp/protoc.zip -d /usr/local bin/protoc && \
   unzip -o /tmp/protoc.zip -d /usr/local include/*
 
+# wkhtml
+RUN apt-get update -y
+RUN apt-get install -y xvfb libfontconfig wkhtmltopdf
+
 # Clean up
 RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
