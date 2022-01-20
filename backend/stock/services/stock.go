@@ -278,7 +278,7 @@ func (s *StockService) Calc(stockNumber string, date *time.Time) (models.StockTe
 	isLowLag := checkLowLag()
 
 	stockTechVal := models.StockTechVal{
-		PriceOnClose: stockList[len(stockList)-1].PriceOnClose,
+		PriceOnClose: stockList[0].PriceOnClose,
 		KDVal: models.StockKD{
 			KVal:       lastKDList[int(lastKD)-1].KVal,
 			DVal:       lastKDList[int(lastKD)-1].DVal,
