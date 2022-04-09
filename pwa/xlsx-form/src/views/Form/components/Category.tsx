@@ -6,10 +6,6 @@ const categoryList = [
         label: "基本支出",
         subCategory: [
             {
-                value: "房租",
-                label: "房租",
-            },
-            {
                 value: "管理費",
                 label: "管理費",
             },
@@ -32,10 +28,6 @@ const categoryList = [
             {
                 value: "影音串流",
                 label: "影音串流",
-            },
-            {
-                value: "修繕",
-                label: "修繕",
             }
         ]
     },
@@ -50,10 +42,6 @@ const categoryList = [
             {
                 value: "外食",
                 label: "外食",
-            },
-            {
-                value: "零食飲料",
-                label: "零食飲料",
             }
         ]
     },
@@ -194,12 +182,16 @@ const categoryList = [
             {
                 value: "燃料稅",
                 label: "燃料稅",
+            },
+            {
+                value: "地價稅",
+                label: "地價稅",
             }
         ]
     },
     {
-        value: "家具家電",
-        label: "家具家電",
+        value: "修繕",
+        label: "修繕",
         subCategory: [
             {
                 value: "家具",
@@ -212,6 +204,28 @@ const categoryList = [
             {
                 value: "家飾收納",
                 label: "家飾收納",
+            },
+            {
+                value: "修繕",
+                label: "修繕",
+            }
+        ]
+    },
+    {
+        value: "醫療",
+        label: "醫療",
+        subCategory: [
+            {
+                value: "產檢",
+                label: "產檢",
+            },
+            {
+                value: "保健食品",
+                label: "保健食品",
+            },
+            {
+                value: "一般生病",
+                label: "一般生病",
             }
         ]
     }
