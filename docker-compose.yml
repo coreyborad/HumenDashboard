@@ -67,6 +67,23 @@ services:
     networks:
       dashboard:
         ipv4_address: 172.20.0.3
+  go-linebot:
+    restart: always
+    image: alpine:3.18
+    volumes:
+      - ./backend/linebot/:/tmp:cached
+    environment:
+      - TZ=Asia/Taipei
+      - LINE_CHANNEL_SECRET=asd
+      - LINE_CHANNEL_ACCESSTOKEN=66
+    command: /tmp/server.run
+    depends_on:
+      - mysql
+      - mongo
+    networks:
+      dashboard:
+        ipv4_address: 172.20.0.11
+
   go-stock-schedule:
     restart: always
     build:
