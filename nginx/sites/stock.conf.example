@@ -1,6 +1,9 @@
 upstream go-stock  {
    server 172.20.0.3:80;  
 }
+upstream go-linebot  {
+   server 172.20.0.11:80;
+}
 server {
     listen 80;
     server_name stock.cabbageattic.com;
@@ -55,6 +58,33 @@ server {
 	    proxy_set_header   Host             $host;
 	    proxy_set_header   X-Real-IP        $remote_addr;
 	    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    }
+
+    location /service/linebot/ {
+
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Credentials' 'true' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range' always;
+        add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,PUT,DELETE,PATCH' always;
+
+        if ($request_method = 'OPTIONS') {
+            add_header 'Access-Control-Allow-Origin' '*' always;
+            add_header 'Access-Control-Allow-Credentials' 'true' always;
+            add_header 'Access-Control-Allow-Headers' 'Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range' always;
+            add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS,PUT,DELETE,PATCH' always;
+            add_header 'Access-Control-Max-Age' 1728000 always;
+            add_header 'Content-Length' 0 always;
+            return 204;
+        }
+
+        proxy_pass  http://go-linebot/;
+        #Proxy Settings
+            proxy_redirect     off;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header   Host             $host;
+            proxy_set_header   X-Real-IP        $remote_addr;
+            proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
     }
 
     location ~ /\.ht {
