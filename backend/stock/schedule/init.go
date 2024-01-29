@@ -22,6 +22,9 @@ func Init() (err error) {
 	scheduler.AddFunc("15 16 * * 1-5", func() {
 		stockConcrete.DailyCalc()
 	})
+	scheduler.AddFunc("* * * * *", func() {
+		stockConcrete.TgPttAlertPerMin()
+	})
 	// stockService.DailyCalc()
 	// stockService.DailyParser()
 

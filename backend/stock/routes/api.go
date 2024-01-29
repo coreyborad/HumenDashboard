@@ -16,7 +16,7 @@ func (r *Router) RegisterAPI(api *gin.RouterGroup) error {
 				"message": "API v1",
 			})
 		})
-		
+
 		authorized := v1.Use(middleware.AuthRequired())
 		{
 			authorized.GET("/testToken", func(ctx *gin.Context) {
@@ -39,6 +39,8 @@ func (r *Router) RegisterAPI(api *gin.RouterGroup) error {
 		// 	})
 		// }
 	}
+
+	api.POST("/tg-msg", r.Stock.TgMessage)
 
 	return nil
 }

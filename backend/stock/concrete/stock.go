@@ -2,14 +2,20 @@ package concrete
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"net/http/cookiejar"
 	"stock/config"
+	"stock/database"
 	"stock/models"
 	"stock/services"
 	"stock/utils"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -170,4 +176,139 @@ func (c *StockConcrete) DailyCalc() error {
 	// Delete file
 	utils.HtmlToImageDelete(imgPath)
 	return nil
+}
+
+func (c *StockConcrete) TgPttAlertPerMin() error {
+	fmt.Println("Start ptt alert now")
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	now := time.Now().In(loc)
+	_, month, day := now.Date()
+	// TG bot
+	bot, err := tgbotapi.NewBotAPI(config.Telegram.Token)
+	if err != nil {
+		fmt.Println("error:", err)
+		return err
+	}
+
+	db := database.GetDB()
+	// Todo, 應該要用kanban,keyword做group去爬就好
+	tgPttAlerts := []*models.TgPttAlert{}
+	err = db.Find(&tgPttAlerts).Error
+	if err != nil {
+		fmt.Println("error:", err)
+		return err
+	}
+
+	if len(tgPttAlerts) > 0 {
+		// https://www.ptt.cc/bbs/{kanban}/index.html
+		for _, tgPttAlert := range tgPttAlerts {
+			chatId, err := strconv.Atoi(tgPttAlert.ChartID)
+			if err != nil {
+				fmt.Println("error:", err)
+				return err
+			}
+			url := fmt.Sprintf(`https://www.ptt.cc/bbs/%s/index.html`, tgPttAlert.Kanban)
+			fmt.Println(url, "KANBAN TARGET url")
+			resp := GetPttContent(url)
+			defer resp.Body.Close()
+			var doc *goquery.Document
+			doc, err = goquery.NewDocumentFromReader(resp.Body)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+
+			for _, node := range doc.Find(".r-ent").Nodes {
+				s := goquery.NewDocumentFromNode(node)
+				titleNode := s.Find(".title")
+				title := strings.TrimSpace(titleNode.Text())
+				if strings.Contains(title, `[公告]`) {
+					continue
+				}
+				if !strings.Contains(title, tgPttAlert.KeyWord) {
+					continue
+				}
+				dateNode := s.Find(".meta > .date")
+				date := strings.TrimSpace(dateNode.Text())
+				// 只找今天的
+				if date != fmt.Sprintf("%d/%d", int(month), day) {
+					continue
+				}
+				pageHref, exists := titleNode.Find("a").Attr("href")
+				if exists {
+					targetHref := fmt.Sprintf("https://www.ptt.cc%s", pageHref)
+					targetTime := GetPttDetailDate(targetHref)
+					if targetTime != nil {
+						fmt.Println(targetTime, "TARGETTIME")
+						subTime := now.Sub(*targetTime).Seconds()
+						fmt.Println(subTime, "SUBTIME")
+						if subTime < 60 {
+							replyMsg := fmt.Sprintf(`[%s] \n [點我前往](%s)`, title, targetHref)
+							fmt.Println(replyMsg, "REPLY")
+							msg := tgbotapi.NewMessage(int64(chatId), replyMsg)
+							msg.ParseMode = tgbotapi.ModeMarkdownV2
+							_, err := bot.Send(msg)
+							if err != nil {
+								fmt.Println(err.Error())
+								continue
+							}
+						}
+					}
+
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func GetPttContent(url string) *http.Response {
+	ageCookie := &http.Cookie{
+		Name:   "over18",
+		Value:  "1",
+		MaxAge: 300,
+		Domain: "www.ptt.cc",
+		Path:   "/",
+	}
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		log.Fatalf("Got error while creating cookie jar %s", err.Error())
+	}
+	client := &http.Client{
+		Jar: jar,
+	}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+		// handle error
+	}
+	req.AddCookie(ageCookie)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+
+	return resp
+}
+
+func GetPttDetailDate(url string) *time.Time {
+	// 取得圖片
+	respContent := GetPttContent(url)
+	defer respContent.Body.Close()
+	targetContent, err := goquery.NewDocumentFromReader(respContent.Body)
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	dateNode := targetContent.Find("#main-content > div:nth-child(4) > span.article-meta-value").Text()
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	targetTime, err := time.ParseInLocation(time.ANSIC, dateNode, loc)
+	if err != nil {
+		fmt.Println(dateNode)
+		return nil
+	}
+
+	return &targetTime
 }
