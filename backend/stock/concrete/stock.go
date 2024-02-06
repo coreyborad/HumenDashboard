@@ -208,7 +208,6 @@ func (c *StockConcrete) TgPttAlertPerMin() error {
 				return err
 			}
 			url := fmt.Sprintf(`https://www.ptt.cc/bbs/%s/index.html`, tgPttAlert.Kanban)
-			fmt.Println(url, "KANBAN TARGET url")
 			resp := GetPttContent(url)
 			defer resp.Body.Close()
 			var doc *goquery.Document
@@ -231,7 +230,9 @@ func (c *StockConcrete) TgPttAlertPerMin() error {
 				dateNode := s.Find(".meta > .date")
 				date := strings.TrimSpace(dateNode.Text())
 				// 只找今天的
-				if date != fmt.Sprintf("%d/%d", int(month), day) {
+				if date != fmt.Sprintf("%d/%02d", int(month), day) {
+					fmt.Println("[Not Today]", date, fmt.Sprintf("%d/%d", int(month), day))
+					fmt.Println(title)
 					continue
 				}
 				pageHref, exists := titleNode.Find("a").Attr("href")
